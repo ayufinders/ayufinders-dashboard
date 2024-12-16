@@ -61,7 +61,10 @@ const TopicQuestions = () => {
     }
   }
 
-  useEffect(()=>{fetchQuestions()}, [])
+  useEffect(()=>{
+    fetchQuestions()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   if(!categoryId) return <>No quiz found.</>
 
