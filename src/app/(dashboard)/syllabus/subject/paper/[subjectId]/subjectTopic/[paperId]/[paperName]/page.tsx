@@ -4,7 +4,6 @@ import axios from 'axios'
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
@@ -321,7 +320,11 @@ const UpdateSubjectTopicDialog = ({ fetchTopics, subjectTopic }: { fetchTopics: 
         </div>
       </div>
       <DialogFooter>
-        <Button type='submit' onClick={updateSubjectTopicHandler}>Update Subject Topic</Button>
+        <Button type='submit' disabled={loading} onClick={updateSubjectTopicHandler}>
+        {
+          loading ? <Spinner /> : "Update Subject Topic"
+        }
+        </Button>
       </DialogFooter>
     </DialogContent>
   </Dialog>

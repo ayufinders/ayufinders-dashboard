@@ -1,5 +1,5 @@
 "use client"
-import React, { createContext, useContext, useState } from 'react'
+import React, { createContext, useContext, useEffect, useState } from 'react'
 
 type User = {
   id: string|null,
@@ -16,25 +16,33 @@ type AppContextType = {
 const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export const AppWrapper = ({children}: {children: React.ReactNode}) => {
-  // Load user data from Local Storage on initial render
-  const loadUserFromLocalStorage = () => {
-    const storedUser = localStorage.getItem("user");
-    return storedUser ? JSON.parse(storedUser) : {
-      id: null,
-      name: null,
-      email: null,
-      loggedIn: false,
-      access: null
-    };
-  };
+  
+  const defaultUser: User = {
+    id: null,
+    name: null,
+    email: null,
+    loggedIn: false,
+    access: null
+  }
 
-  const [user, setUser] = useState<User>(loadUserFromLocalStorage);
+  useEffect(()=>{
+    const storedUser = localStorage.getItem("user");
+    if (storedUser) {
+      setUser(JSON.parse(storedUser))
+    }
+    setIsInitialized(true);
+
+  }, [])
+  
+  const [user, setUser] = useState<User>(defaultUser);
+  const [isInitialized, setIsInitialized] = useState(false);
+
   return (
     <AppContext.Provider value={{
       user,
       setUser
     }}>
-      {children}
+      {isInitialized ? children : null}
     </AppContext.Provider>
   )
 }

@@ -18,13 +18,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { useToast } from "@/hooks/use-toast";
-import { useRouter, useParams } from "next/navigation";
-import { Textarea } from "@/components/ui/textarea";
-import { ChevronRight, Trash } from "lucide-react"; // Importing icons
+import { useParams } from "next/navigation";
 
 const SubjectTopicData = () => {
   const [mcqQuestions, setMcqQuestions] = useState<QuestionType[]>([]);
@@ -100,8 +95,7 @@ const SubjectTopicData = () => {
   );
 };
 
-const QuestionsList = ({ questions }: { questions: any }) => {
-  const router = useRouter();
+const QuestionsList = ({ questions }: { questions: QuestionType[] }) => {
 
   return (
     <Table className="w-full">

@@ -54,4 +54,4 @@ const Syllabus = () => {
   )
 }
 
-export default Syllabus
+export default Syllabus;
