@@ -33,7 +33,6 @@ export default function LoginPage() {
           loggedIn: true,
           access: response.data.admin.access,
         }
-        console.log(user.access)
 
         setUser(user)
         localStorage.setItem("user", JSON.stringify(user));
