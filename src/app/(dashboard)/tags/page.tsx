@@ -13,18 +13,19 @@ import {
 import {
   Table,
   TableBody,
-  TableCaption,
   TableCell,
   TableHead,
   TableHeader,
   TableRow,
-  TableFooter
 } from "@/components/ui/table"
 
 import { Input } from '@/components/ui/input'
 import axios from 'axios'
 import { useToast } from '@/hooks/use-toast'
 import { Textarea } from '@/components/ui/textarea'
+import { Trash } from 'lucide-react'
+import Spinner from '@/components/Spinner'
+import { useUserContext } from '@/context'
 
 const Tags = () => {
 
@@ -54,10 +55,10 @@ const Tags = () => {
   }, [])
 
   return (
-    <main className='p-4'>
-      <div className='sticky border-b z-50 top-0 bg-white p-4'>
-        <div className='flex flex-row justify-between items-center'>
-          <p className='font-bold text-4xl'>TAGS</p>
+    <main className='p-4 relative'>
+      <div className='sticky z-50 top-0 p-4'>
+        <div className='flex flex-row justify-between items-center gap-2'>
+          <p className='font-bold text-4xl text-gray-900'>Tags</p>
           <div className='flex flex-row gap-2 items-center'>
             <div>            
               <Input onChange={(e)=>{setSearch(e.target.value)}} className="p-4" placeholder='Search for tags...'></Input>
@@ -67,7 +68,7 @@ const Tags = () => {
         </div>
       </div>
       
-      <section>
+      <section className='max-h-[75vh] min-w-[80vw] overflow-y-scroll border mt-2'>
         <TagList tags={filteredTags} fetchTags={fetchTags}/>
       </section>
     </main>
@@ -78,10 +79,12 @@ const AddTag = ({fetchTags}: {fetchTags: ()=>void}) => {
 
   const [tagName, setTagName] = useState("")
   const [tagDesc, setTagDesc] = useState("")
+  const [loading, setLoading] = useState(false)
   const {toast} = useToast()
 
   const addTagHandler = async () => {
     try{
+      setLoading(true)
       if(tagName==""){
         toast({
           title: "No Tag Name.",
@@ -120,11 +123,12 @@ const AddTag = ({fetchTags}: {fetchTags: ()=>void}) => {
     } finally {
       setTagName("")
       setTagDesc("")
+      setLoading(false)
     }
   }
 
   return <Dialog>
-  <DialogTrigger className='border rounded-md shadow-sm p-2 px-4 text-sm hover:bg-gray-100 transition-all'>
+  <DialogTrigger className='bg-gradient-to-b from-gray-500 to-gray-800 text-white font-semibold border rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 transition-all duration-300'>
     Create Tag
   </DialogTrigger>
     <DialogContent>
@@ -136,7 +140,12 @@ const AddTag = ({fetchTags}: {fetchTags: ()=>void}) => {
         <Textarea value={tagDesc} onChange={(e)=>{setTagDesc(e.target.value)}} rows={2} placeholder="Tag Description (optional)"></Textarea>
       </div>
       <DialogFooter>
-        <Button type='submit' onClick={addTagHandler}>Create Tag</Button>
+        <Button type='submit' disabled={loading} onClick={addTagHandler} className='bg-gradient-to-b from-gray-500 to-gray-800 hover:scale-105 font-semibold transition-all duration-300'>
+          {loading 
+          ? <Spinner />
+          : "Create Tag"
+          }
+        </Button>
       </DialogFooter>
     </DialogContent>
     
@@ -147,19 +156,26 @@ type tagType = {
   _id: string
   name: string,
   description: string,
-  questions: string[]
+  questions: string[],
+  createdBy: Admin
+}
+
+type Admin = {
+  _id: string
+  name: string,
+  email: string
 }
 
 const TagList = ({tags, fetchTags}: {tags: tagType[], fetchTags: ()=>void}) => {
 
 
   return <Table>
-  <TableCaption>A list of your created tags.</TableCaption>
-  <TableHeader>
+  <TableHeader className='bg-gray-50'>
     <TableRow>
       <TableHead className="w-[100px]">S. No.</TableHead>
       <TableHead>Name</TableHead>
       <TableHead>Description</TableHead>
+      <TableHead>Created</TableHead>
       <TableHead>#Questions</TableHead>
       <TableHead></TableHead>
     </TableRow>
@@ -168,8 +184,9 @@ const TagList = ({tags, fetchTags}: {tags: tagType[], fetchTags: ()=>void}) => {
     {tags.map((tag: tagType, index) => (
       <TableRow key={index}>
         <TableCell className="font-medium">{index+1}</TableCell>
-        <TableCell>{tag.name}</TableCell>
+        <TableCell className='font-medium'>{tag.name}</TableCell>
         <TableCell>{tag.description}</TableCell>
+        <TableCell><div className='bg-gray-100 p-1 rounded-lg w-fit'>{tag.createdBy?.name || ''}</div></TableCell>
         <TableCell>{tag.questions?.length}</TableCell>
         <TableCell>
           <DeleteModalButton fetchTags={fetchTags} tagId={tag._id} tagName={tag.name}/>
@@ -177,12 +194,7 @@ const TagList = ({tags, fetchTags}: {tags: tagType[], fetchTags: ()=>void}) => {
       </TableRow>
     ))}
   </TableBody>
-  <TableFooter>
-    <TableRow>
-      <TableCell colSpan={4}>Total</TableCell>
-      <TableCell className="text-right">{tags.length}</TableCell>
-    </TableRow>
-  </TableFooter>
+  
 </Table>
 
 }
@@ -190,9 +202,12 @@ const TagList = ({tags, fetchTags}: {tags: tagType[], fetchTags: ()=>void}) => {
 const DeleteModalButton = ({tagId, tagName, fetchTags}: {tagId: string, tagName: string, fetchTags: ()=>void}) => {
 
   const {toast} = useToast()
+  const [loading, setLoading] = useState(false)
+  const {user} = useUserContext()
   
   const deleteTagHandler = async (tagId: string, tagName: string) => {
     try{
+      setLoading(true)
       await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/tag/${tagId}`)
       toast({
         title: "Tag deleted.",
@@ -201,12 +216,14 @@ const DeleteModalButton = ({tagId, tagName, fetchTags}: {tagId: string, tagName:
       fetchTags()
     } catch(error){
       console.error(error)
+    } finally {
+      setLoading(true)
     }
   }
 
   return <Dialog>
-  <DialogTrigger className='border rounded-md shadow-sm p-2 py-[7px] hover:bg-gray-100 transition-all'>
-    Delete
+  <DialogTrigger className='bg-gradient-to-b from-red-500 to-red-700 rounded-md shadow-sm p-2 py-[7px] hover:scale-105 transition-all'>
+    <Trash size={16} color='white'/>
   </DialogTrigger>
   <DialogContent>
     <DialogHeader>
@@ -218,7 +235,18 @@ const DeleteModalButton = ({tagId, tagName, fetchTags}: {tagId: string, tagName:
       <DialogFooter>
         <Button onClick={()=>{
           deleteTagHandler(tagId, tagName)
-        }}>Delete</Button>
+        }}
+        disabled={loading||user.access=='limited'}
+        className='from-red-500 to-red-700 bg-gradient-to-b hover:scale-105 transition-all duration-300'
+        >
+          { 
+            user.access=='limited'
+            ? "Access Denied"
+            : loading ? <Spinner /> : "Delete"
+            
+          }
+
+        </Button>
       </DialogFooter>
     </DialogHeader>
   </DialogContent>

@@ -34,6 +34,9 @@ import { DialogTrigger } from '@radix-ui/react-dialog';
 import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { ChevronRight, Trash } from 'lucide-react';
+import Spinner from '@/components/Spinner';
+import { useUserContext } from '@/context';
 
 const TopicQuestions = () => {
   const params = useParams()
@@ -71,9 +74,9 @@ const TopicQuestions = () => {
   return (
     <main className='p-4'>
       <div className='sticky top-0 z-50'>
-        <div className='flex flex-row items-center p-4 border-b justify-between bg-white'>
+        <div className='flex flex-row items-center p-4 justify-between bg-white'>
             <div>
-              <p className='text-4xl font-bold'>{categoryName}</p>
+              <p className='text-3xl font-bold'>{categoryName}</p>
             </div>
             <div className='flex flex-row items-center gap-2'>
               <div>
@@ -84,7 +87,7 @@ const TopicQuestions = () => {
           </div>
       </div>
         
-      <section>
+      <section className='max-h-[75vh] min-w-[80vw] overflow-y-scroll border'>
         <QuestionsList questions={filteredQues} fetchQuestions={fetchQuestions}/>
       </section>
     </main>
@@ -94,15 +97,16 @@ const TopicQuestions = () => {
 const QuestionsList = ({fetchQuestions, questions}: {fetchQuestions: ()=>void, questions: QuestionType[]}) => {
   
   return <Table>
-  <TableHeader>
+  <TableHeader className='bg-gray-50'>
     <TableRow>
-      <TableHead>S. No.</TableHead>
+      <TableHead className='w-[80px]'>S. No.</TableHead>
       <TableHead>Question Text</TableHead>
-      <TableHead>Option 1</TableHead>
-      <TableHead>Option 2</TableHead>
-      <TableHead>Option 3</TableHead>
-      <TableHead>Option 4</TableHead>
-      <TableHead>Correct Option</TableHead>
+      <TableHead>A</TableHead>
+      <TableHead>B</TableHead>
+      <TableHead>C</TableHead>
+      <TableHead>D</TableHead>
+      <TableHead>Correct</TableHead>
+      <TableHead className='text-center'>Added</TableHead>
       <TableHead></TableHead>
       <TableHead></TableHead>
       <TableHead></TableHead>
@@ -111,14 +115,15 @@ const QuestionsList = ({fetchQuestions, questions}: {fetchQuestions: ()=>void, q
   <TableBody>
     {
       questions.map((question: QuestionType, index: number) => {
-        return <TableRow key={index} className='cursor-pointer'>
-          <TableCell>{index + 1}</TableCell>
-          <TableCell>{question.text}</TableCell>
+        return <TableRow key={question._id} className='cursor-pointer'>
+          <TableCell className='font-medium'>{index + 1}</TableCell>
+          <TableCell className='font-medium'>{question.text}</TableCell>
           <TableCell>{question.options[0].text}</TableCell>
           <TableCell>{question.options[1].text}</TableCell>
           <TableCell>{question.options[2].text}</TableCell>
           <TableCell>{question.options[3].text}</TableCell>
-          <TableCell>{question.correctOption + 1}</TableCell>
+          <TableCell className='text-center'>{question.correctOption + 1}</TableCell>
+          <TableCell className='text-xs'><div className='bg-gray-100 rounded-lg p-1'>{question.createdBy?.name || ''}</div></TableCell>
           <TableCell>
             <UpdateQuestionDialog question={question} fetchQues={fetchQuestions}/>
           </TableCell>
@@ -139,9 +144,12 @@ const QuestionsList = ({fetchQuestions, questions}: {fetchQuestions: ()=>void, q
 const DeleteModalButton = ({quesId, fetchQues}: {quesId: string, fetchQues: ()=>void}) => {
 
   const {toast} = useToast()
+  const [loading, setLoading] = useState(false)
+  const {user} = useUserContext()
   
   const deleteTopicHandler = async (quesId: string) => {
     try{
+      
       await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${quesId}`)
       toast({
         title: "Question deleted.",
@@ -149,12 +157,14 @@ const DeleteModalButton = ({quesId, fetchQues}: {quesId: string, fetchQues: ()=>
       fetchQues()
     } catch(error){
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
 
   return <Dialog>
-  <DialogTrigger className='border rounded-md shadow-sm p-2 py-[7px] hover:bg-gray-100 transition-all'>
-    Delete
+  <DialogTrigger className='bg-gradient-to-b from-red-500 to-red-700 rounded-md shadow-sm p-2 hover:scale-105 duration-300 transition-all'>
+    <Trash size={16} color='white'/>
   </DialogTrigger>
   <DialogContent>
     <DialogHeader>
@@ -168,7 +178,16 @@ const DeleteModalButton = ({quesId, fetchQues}: {quesId: string, fetchQues: ()=>
     <DialogFooter>
       <Button onClick={()=>{
           deleteTopicHandler(quesId)
-        }}>Delete</Button>
+        }}
+        className='bg-gradient-to-b from-red-500 to-red-800 hover:scale-105 transition-all duration-300 font-semibold'
+        disabled={loading||user.access=='limited'}
+        >
+          {
+            user.access=='full' 
+            ? loading? <Spinner /> : "Delete"
+            : 'Access Denied'
+          }
+        </Button>
     </DialogFooter>
   </DialogContent>
 </Dialog>
@@ -184,8 +203,8 @@ const TagsMenu = ({tags, questionTags, selectedTags, setSelectedTags}: {tags: Ta
   }
 
   return <DropdownMenu>
-  <DropdownMenuTrigger className='border p-2 px-4 rounded-md text-sm'>Select</DropdownMenuTrigger>
-  <DropdownMenuContent>
+  <DropdownMenuTrigger className='border p-2 px-4 w-[100px] rounded-md text-sm'>Select</DropdownMenuTrigger>
+  <DropdownMenuContent className='w-[300px]'>
     <DropdownMenuLabel>Tags</DropdownMenuLabel>
     <DropdownMenuSeparator />
     {tags.map(item => {
@@ -215,6 +234,7 @@ const CreateQuestionDialog = ({categoryId, fetchQues}: {categoryId: string, fetc
   const [link, setLink] = useState("")
 
   const {toast} = useToast()
+  const [loading, setLoading] = useState(false)
 
   const fetchTags = async () => {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`)
@@ -229,6 +249,13 @@ const CreateQuestionDialog = ({categoryId, fetchQues}: {categoryId: string, fetc
 
   const createQuestion = async () => {
     try{
+      setLoading(true)
+      if (!quesText || !op1 || !op2 || !op3 || !op4 || !correctOp){
+        toast({
+          title: "Invalid Question Data",
+          variant: "destructive"
+        })
+      }
       await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${categoryId}`, {
         text: quesText,
         options: [
@@ -267,6 +294,7 @@ const CreateQuestionDialog = ({categoryId, fetchQues}: {categoryId: string, fetc
     } catch(error){
       console.log(error)
     } finally {
+      setLoading(false)
       setQuesText("")
       setOp1("")
       setOp2("")
@@ -292,7 +320,7 @@ const CreateQuestionDialog = ({categoryId, fetchQues}: {categoryId: string, fetc
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Create Question</Button>
+        <Button className='bg-gradient-to-b from-gray-600 to-gray-900 font-semibold hover:scale-105 transition-all duration-300'>Create Question</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[850px]">
         <DialogHeader>
@@ -440,7 +468,11 @@ const CreateQuestionDialog = ({categoryId, fetchQues}: {categoryId: string, fetc
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={createQuestion}>Create Question</Button>
+          <Button type="submit" onClick={createQuestion} disabled={loading}>
+            {
+              loading ? <Spinner/> : "Create Question"
+            }
+          </Button>
           <DialogClose asChild>
             <Button type="button" variant="secondary">
               Close
@@ -471,6 +503,7 @@ const UpdateQuestionDialog = ({question, fetchQues}: {question: QuestionType, fe
   const [link, setLink] = useState(question.reference.link)
 
   const {toast} = useToast()
+  const [loading, setLoading] = useState(false)
 
   const fetchTags = async () => {
     const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`)
@@ -485,6 +518,13 @@ const UpdateQuestionDialog = ({question, fetchQues}: {question: QuestionType, fe
 
   const updateQuestion = async () => {
     try{
+      setLoading(true)
+      if (!quesText || !op1 || !op2 || !op3 || !op4 || !correctOp){
+        toast({
+          title: "Invalid Question Data",
+          variant: "destructive"
+        })
+      }
       await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${question._id}`, {
         text: quesText,
         options: [
@@ -524,6 +564,7 @@ const UpdateQuestionDialog = ({question, fetchQues}: {question: QuestionType, fe
     } finally {
       fetchQues()
       setSelectedTags([])
+      setLoading(false)
     }
   }
 
@@ -539,7 +580,8 @@ const UpdateQuestionDialog = ({question, fetchQues}: {question: QuestionType, fe
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">Edit</Button>
+        <Button className='bg-gradient-to-b from-gray-600 to-gray-900 px-4 py-1 hover:scale-105 transition-all duration-300'>
+          Edit <ChevronRight size={20}/></Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[850px]">
         <DialogHeader>
@@ -700,7 +742,11 @@ const UpdateQuestionDialog = ({question, fetchQues}: {question: QuestionType, fe
           </div>
         </div>
         <DialogFooter>
-          <Button type="submit" onClick={updateQuestion}>Update Question</Button>
+          <Button type="submit" onClick={updateQuestion} disabled={loading}>
+            {
+              loading ? <Spinner /> : "Update Question"
+            }
+          </Button>
           <DialogClose asChild>
             <Button type="button" variant="secondary">
               Close
@@ -716,7 +762,7 @@ const ViewQuestionDialog = ({question}: {question: QuestionType}) => {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline">More</Button>
+        <Button variant="outline">Info</Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
         <DialogHeader>
@@ -732,17 +778,26 @@ const ViewQuestionDialog = ({question}: {question: QuestionType}) => {
               <div key={index}>{index+1}. {option.text}</div>
             ))}
           </div>
-          <div>Correct: <span className='font-semibold text-green-600'>{question.options[question.correctOption].text}</span></div>
-          <div className='flex flex-col bg-gray-100 rounded-lg p-4'>
+          <div>Correct: <span className='text-green-600'>{question.options[question.correctOption]?.text || "N/A"}</span></div>
+          <div className='flex flex-col bg-gray-50 rounded-lg p-4'>
+            <p className='font-semibold'>Explanation</p>
+            <div>{question.explanation || 'N/A'}</div>
+          </div>
+          <div className='flex flex-col bg-gray-50 rounded-lg p-4'>
             <p className='font-semibold'>Reference</p>
             <div>{question.reference.title || 'N/A'}</div>
             <div className='text-blue-800'>{question.reference.link || 'N/A'}</div>
           </div>
-          <div className='flex flex-row overflow-x-scroll w-96 p-2 gap-2 rounded-lg border'>
+          <div className='flex flex-col bg-gray-50 rounded-lg p-4'>
+            <p className='font-semibold'>Tags</p>
+            <div className='flex flex-row overflow-x-scroll w-84 p-2 gap-2 rounded-lg border'>
             {question.tagId.map((tag) => (
-              <div className='bg-gray-100 rounded-lg p-2 text-nowrap' key={tag.name}>{tag.name}</div>
+              <div className='bg-gray-100 rounded-lg p-2 text-nowrap' key={tag._id}>{tag.name}</div>
             ))}
           </div>
+          </div>
+          
+          
         </div>
         
       </DialogContent>
@@ -762,7 +817,8 @@ type QuestionType = {
     link?: string
   },
   categoryId: string,
-  tagId: TagType[]
+  tagId: TagType[],
+  createdBy: AdminType
 }
 
 type OptionType = {
@@ -773,6 +829,12 @@ type TagType = {
   name: string,
   description: string,
   questions: QuestionType[]
+}
+
+type AdminType = {
+  name: string,
+  email: string,
+  id: string
 }
 
 export default TopicQuestions;

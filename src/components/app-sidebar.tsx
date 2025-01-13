@@ -1,8 +1,9 @@
 "use client"
-import { Tags, Files, Settings } from "lucide-react"
+import { Tags, Files, Settings, Book, UserCircle2, LogOut } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -12,6 +13,9 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
 import { useRouter } from "next/navigation"
+import { useUserContext } from "@/context"
+import { Button } from "./ui/button"
+import axios from "axios"
 
 // Menu items.
 const items = [
@@ -26,6 +30,11 @@ const items = [
     icon: Files,
   },
   {
+    title: "Syllabus",
+    url: "syllabus",
+    icon: Book,
+  },
+  {
     title: "Settings",
     url: "#",
     icon: Settings,
@@ -34,6 +43,14 @@ const items = [
 
 export function AppSidebar() {
   const router = useRouter()
+  const {user, setUser} = useUserContext()
+
+  async function deleteCookie() {
+    await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/user/admin-logout`, {
+      withCredentials: true
+    })
+  }
+  
   return (
     <Sidebar>
       <SidebarHeader>
@@ -41,7 +58,9 @@ export function AppSidebar() {
         onClick={()=>{
           router.replace('/')
         }}
-        className="font-bold text-2xl">AyuFinders</div>
+        className="font-extrabold text-2xl border-b px-2 py-4 text-gray-700">AyuFinders</div>
+
+        
       </SidebarHeader>
       <SidebarContent>
         <SidebarGroup>
@@ -49,10 +68,10 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (
-                <SidebarMenuItem key={item.title}>
+                <SidebarMenuItem key={item.title} className="cursor-pointer">
                   <SidebarMenuButton asChild>
                     <div onClick={()=>{
-                      router.push(`/${item.url}`)
+                      router.replace(`/${item.url}`)
                     }}>
                       <item.icon />
                       <span>{item.title}</span>
@@ -63,7 +82,43 @@ export function AppSidebar() {
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
+        
       </SidebarContent>
+      <SidebarFooter>
+        <div className="flex flex-col gap-2 border-b p-4 rounded-xl bg-gradient-to-b from-gray-200 to-gray-400 text-gray-700">
+            <p className="text-lg font-semibold">Admin</p>
+            <div className="flex flex-row gap-2 items-center">
+              <div><UserCircle2 className="h-6 w-6"/></div>
+              <div className="font-normal">
+                <div>{user.name}</div>
+              </div>
+            </div>
+            <div className="font-light text-sm flex flex-col gap-1 text-gray-700">
+              <p><strong>Email</strong></p>
+              <p className="w-52 overflow-x-scroll rounded-lg bg-gray-100 font-semibold p-2 text-xs">{user.email}</p>
+              <p><strong>ID</strong></p>
+              <p className="w-52 overflow-x-scroll rounded-lg bg-gray-100 font-semibold p-2 text-xs">{user.id}</p>
+            </div>
+          </div>
+        <Button
+        className="font-semibold w-full bg-gradient-to-b from-red-500 to-red-800 text-white hover:scale-105 transition-all duration-300"
+        onClick={()=>{
+          setUser({
+            name: null,
+            email: null,
+            id: null,
+            access: null,
+            loggedIn: false
+          })
+
+          deleteCookie()
+          localStorage.removeItem('user')
+          router.replace('/signin')
+        }}
+        >
+          Logout <LogOut />
+        </Button>
+        </SidebarFooter>
     </Sidebar>
   )
 }
