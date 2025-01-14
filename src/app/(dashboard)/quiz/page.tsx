@@ -111,7 +111,7 @@ const QuizCategories = ({
             <TableHead className="text-gray-700">Description</TableHead>
             <TableHead className="text-gray-700 text-right">Questions</TableHead>
             <TableHead></TableHead>
-            <TableHead></TableHead>
+            
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -125,15 +125,13 @@ const QuizCategories = ({
               <TableCell className="text-gray-800 text-center">
                 {topic.questions.length}
               </TableCell>
-              <TableCell>
+              <TableCell className="flex flex-row items-center">
                 <Button
                   className="bg-gradient-to-b from-gray-500 to-gray-800 text-white hover:scale-105 px-4 py-0 transition-all duration-300"
                   onClick={() => router.push(`quiz/${topic._id}/${topic.name}`)}
                 > View
                   <ChevronRight size={24} color="white" className="font-bold"/>
                 </Button>
-              </TableCell>
-              <TableCell>
 
                 <EditTopic
                 fetchTopics={fetchTopics}
@@ -144,8 +142,9 @@ const QuizCategories = ({
                   topicName={topic.name}
                   fetchTopics={fetchTopics}
                 />
-                
+
               </TableCell>
+              
             </TableRow>
           ))}
         </TableBody>
@@ -279,7 +278,7 @@ const EditTopic = ({ fetchTopics, topic }: { fetchTopics: () => void, topic: Top
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className='bg-gradient-to-b from-gray-600 to-gray-900 px-4 py-1 hover:scale-105 transition-all duration-300'>
+        <Button className='bg-gradient-to-b from-gray-500 to-gray-800 px-4 py-1 hover:scale-105 transition-all duration-300'>
           Edit <ChevronRight size={20}/></Button>
       </DialogTrigger>
       <DialogContent>
