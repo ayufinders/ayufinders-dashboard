@@ -23,7 +23,7 @@ import { Input } from '@/components/ui/input'
 import axios from 'axios'
 import { useToast } from '@/hooks/use-toast'
 import { Textarea } from '@/components/ui/textarea'
-import { Trash } from 'lucide-react'
+import { ChevronRight, Trash } from 'lucide-react'
 import Spinner from '@/components/Spinner'
 import { useUserContext } from '@/context'
 
@@ -211,9 +211,10 @@ const EditTag = ({fetchTags, tag}: {fetchTags: ()=>void, tag: tagType}) => {
   }
 
   return <Dialog>
-  <DialogTrigger className='bg-gradient-to-b from-gray-500 to-gray-800 text-white font-semibold border rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 transition-all duration-300'>
-    Edit
-  </DialogTrigger>
+    <DialogTrigger className='flex flex-row gap-2 items-center bg-gradient-to-b from-gray-600 to-gray-900 text-white font-medium rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 duration-300 transition-all'>
+      <span>Edit</span> 
+      <ChevronRight size={16}/>
+    </DialogTrigger>
     <DialogContent>
       <DialogHeader>
         <DialogTitle className='my-2'>Edit Tag</DialogTitle>
@@ -272,7 +273,7 @@ const TagList = ({tags, fetchTags}: {tags: tagType[], fetchTags: ()=>void}) => {
         <TableCell>{tag.description}</TableCell>
         <TableCell><div className='bg-gray-100 p-1 rounded-lg w-fit'>{tag.createdBy?.name || ''}</div></TableCell>
         <TableCell>{tag.questions?.length}</TableCell>
-        <TableCell>
+        <TableCell className='flex flex-row gap-2 items-center'>
           <EditTag fetchTags={fetchTags} tag={tag}/>
           <DeleteModalButton fetchTags={fetchTags} tagId={tag._id} tagName={tag.name}/>
         </TableCell>
@@ -307,7 +308,7 @@ const DeleteModalButton = ({tagId, tagName, fetchTags}: {tagId: string, tagName:
   }
 
   return <Dialog>
-  <DialogTrigger className='bg-gradient-to-b from-red-500 to-red-700 rounded-md shadow-sm p-2 py-[7px] hover:scale-105 transition-all'>
+  <DialogTrigger className='bg-gradient-to-b from-red-500 to-red-700 rounded-md shadow-sm p-2 hover:scale-105 transition-all'>
     <Trash size={16} color='white'/>
   </DialogTrigger>
   <DialogContent>
