@@ -134,11 +134,17 @@ const QuizCategories = ({
                 </Button>
               </TableCell>
               <TableCell>
+
+                <EditTopic
+                fetchTopics={fetchTopics}
+                topic={topic}
+                />
                 <DeleteModalButton
                   topicId={topic._id}
                   topicName={topic.name}
                   fetchTopics={fetchTopics}
                 />
+                
               </TableCell>
             </TableRow>
           ))}
@@ -227,6 +233,89 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
     </Dialog>
   );
 };
+
+const EditTopic = ({ fetchTopics, topic }: { fetchTopics: () => void, topic: TopicType }) => {
+  const [topicName, setTopicName] = useState("");
+  const [topicDesc, setTopicDesc] = useState("");
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false)
+
+  const editTopicHandler = async () => {
+    try {
+      setLoading(true)
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${topic._id}`,
+        {
+          name: topicName,
+          description: topicDesc,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true
+        }
+      );
+      
+      toast({
+        title: response.data.success
+          ? "Topic updated"
+          : "Topic not updated",
+        description: response.data.success
+          ? `${topicName} successfully updated.`
+          : `${topicName} does not exist.`,
+        variant: response.data.success ? "default" : "destructive",
+      });
+      fetchTopics();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setTopicName("");
+      setTopicDesc("");
+      setLoading(false)
+    }
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className='bg-gradient-to-b from-gray-600 to-gray-900 px-4 py-1 hover:scale-105 transition-all duration-300'>
+          Edit <ChevronRight size={20}/></Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="my-2 text-gray-700">Edit Topic</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-2">
+          <Input
+            value={topicName}
+            onChange={(e) => setTopicName(e.target.value)}
+            placeholder="Topic Name"
+          />
+          <Textarea
+            value={topicDesc}
+            onChange={(e) => setTopicDesc(e.target.value)}
+            rows={3}
+            placeholder="Topic Description (optional)"
+          />
+        </div>
+        <DialogFooter>
+          <Button
+            className="bg-gradient-to-b from-gray-600 to-gray-900 text-white hover:scale-105 font-semibold transition-all duration-300"
+            onClick={editTopicHandler}
+            disabled={loading}
+          >
+            { 
+              loading? <Spinner /> : "Add Topic"
+            }
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+
 
 const DeleteModalButton = ({
   topicId,
