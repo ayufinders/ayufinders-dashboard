@@ -83,6 +83,7 @@ const AddTag = ({fetchTags}: {fetchTags: ()=>void}) => {
   const [tagDesc, setTagDesc] = useState("")
   const [loading, setLoading] = useState(false)
   const {toast} = useToast()
+  const {user} = useUserContext()
 
   const addTagHandler = async () => {
     try{
@@ -97,12 +98,14 @@ const AddTag = ({fetchTags}: {fetchTags: ()=>void}) => {
       const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/tag/`, 
         {
           name: tagName,
-          description: tagDesc
+          description: tagDesc,
+          createdBy: user.id
         },
         {
           headers: {
             'Content-Type': 'application/json'
-          }
+          },
+          withCredentials: true
         }
       )
       
@@ -153,6 +156,85 @@ const AddTag = ({fetchTags}: {fetchTags: ()=>void}) => {
     
   </Dialog>
 }
+
+const EditTag = ({fetchTags}: {fetchTags: ()=>void}) => {
+
+  const [tagName, setTagName] = useState("")
+  const [tagDesc, setTagDesc] = useState("")
+  const [loading, setLoading] = useState(false)
+  const {toast} = useToast()
+
+  const editTagHandler = async () => {
+    try{
+      setLoading(true)
+      if(tagName==""){
+        toast({
+          title: "No Tag Name.",
+          description: "Enter tag name to edit a new tag.",
+          variant: "destructive"
+        })
+      }
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/tag/`, 
+        {
+          name: tagName,
+          description: tagDesc
+        },
+        {
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          withCredentials: true
+        }
+      )
+      
+      if(!response.data.tag){
+        toast({
+          title: "Tag not updated.",
+          description: `${tagName} does not exists.`,
+        })}
+        
+      else {
+        toast({
+          title: "Tag updated.",
+          description: `${tagName} has been successfully edited.`,
+        })
+        fetchTags()
+      }
+        
+    } catch (error){
+      console.log(error)
+    } finally {
+      setTagName("")
+      setTagDesc("")
+      setLoading(false)
+    }
+  }
+
+  return <Dialog>
+  <DialogTrigger className='bg-gradient-to-b from-gray-500 to-gray-800 text-white font-semibold border rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 transition-all duration-300'>
+    Edit
+  </DialogTrigger>
+    <DialogContent>
+      <DialogHeader>
+        <DialogTitle className='my-2'>Edit Tag</DialogTitle>
+      </DialogHeader>
+      <div className='flex flex-col gap-2'>
+        <Input value={tagName} onChange={(e)=>{setTagName(e.target.value)}} type="text" placeholder="Tag Name"></Input>
+        <Textarea value={tagDesc} onChange={(e)=>{setTagDesc(e.target.value)}} rows={2} placeholder="Tag Description (optional)"></Textarea>
+      </div>
+      <DialogFooter>
+        <Button type='submit' disabled={loading} onClick={editTagHandler} className='bg-gradient-to-b from-gray-500 to-gray-800 hover:scale-105 font-semibold transition-all duration-300'>
+          {loading 
+          ? <Spinner />
+          : "Update Tag"
+          }
+        </Button>
+      </DialogFooter>
+    </DialogContent>
+    
+  </Dialog>
+}
+
 
 type tagType = {
   _id: string
