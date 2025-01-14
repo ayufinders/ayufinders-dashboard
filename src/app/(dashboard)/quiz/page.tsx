@@ -125,7 +125,7 @@ const QuizCategories = ({
               <TableCell className="text-gray-800 text-center">
                 {topic.questions.length}
               </TableCell>
-              <TableCell className="flex flex-row items-center">
+              <TableCell className="flex flex-row items-center gap-2">
                 <Button
                   className="bg-gradient-to-b from-gray-500 to-gray-800 text-white hover:scale-105 px-4 py-0 transition-all duration-300"
                   onClick={() => router.push(`quiz/${topic._id}/${topic.name}`)}
