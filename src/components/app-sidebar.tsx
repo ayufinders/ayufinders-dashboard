@@ -103,6 +103,8 @@ export function AppSidebar() {
         <Button
         className="font-semibold w-full bg-gradient-to-b from-red-500 to-red-800 text-white hover:scale-105 transition-all duration-300"
         onClick={()=>{
+          router.replace('/signin')
+          deleteCookie()
           setUser({
             name: null,
             email: null,
@@ -110,10 +112,7 @@ export function AppSidebar() {
             access: null,
             loggedIn: false
           })
-
-          deleteCookie()
           localStorage.removeItem('user')
-          router.replace('/signin')
         }}
         >
           Logout <LogOut />

@@ -303,7 +303,7 @@ const DeleteModalButton = ({tagId, tagName, fetchTags}: {tagId: string, tagName:
     } catch(error){
       console.error(error)
     } finally {
-      setLoading(true)
+      setLoading(false)
     }
   }
 
