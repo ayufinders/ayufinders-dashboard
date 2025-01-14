@@ -33,6 +33,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { Textarea } from '@/components/ui/textarea'
 import { ChevronRight, Trash } from 'lucide-react' // Importing icons
 import Spinner from '@/components/Spinner'
+import { useUserContext } from '@/context'
 
 const SubjectTopics = () => {
   const [subjectTopics, setSubjectTopics] = useState<SubjectTopicType[]>([])
@@ -340,6 +341,7 @@ const DeleteModalButton = ({ topicId, topicName, fetchTopics }: { topicId: strin
 
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const {user} = useUserContext()
 
   const deleteTopicHandler = async (topicId: string, topicName: string) => {
     try {
@@ -372,11 +374,13 @@ const DeleteModalButton = ({ topicId, topicName, fetchTopics }: { topicId: strin
       </DialogHeader>
       <DialogFooter>
         <Button onClick={() => { deleteTopicHandler(topicId, topicName) }}
-        disabled={loading}
+        disabled={loading||user.access==='limited'}
         className='bg-gradient-to-b from-red-500 to-red-800 text-white font-medium rounded-md shadow-sm p-2 text-sm hover:scale-105 duration-300 transition-all flex items-center gap-2'
         >
           {
-            loading ? <Spinner /> : "Delete"
+            user.access==='limited'
+            ? "Access Denied"
+            : loading? <Spinner /> : "Delete"
           }
         </Button>
       </DialogFooter>

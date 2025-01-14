@@ -26,6 +26,8 @@ import { useRouter, useParams } from 'next/navigation'
 import { Textarea } from '@/components/ui/textarea'
 import { ChevronRight, Trash } from 'lucide-react'
 import Spinner from '@/components/Spinner'
+import { useUserContext } from '@/context'
+import { access } from 'fs'
 
 const Subject = () => {
   const [subjects, setSubjects] = useState<SubjectType[]>([])
@@ -283,6 +285,7 @@ const EditSubject = ({ fetchTopics, year, sub }: { fetchTopics: () => void, year
 const DeleteModalButton = ({ subId, subName, fetchTopics }: { subId: string, subName: string, fetchTopics: () => void }) => {
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const {user} = useUserContext()
 
   const deleteSubjectHandler = async () => {
     try {
@@ -316,11 +319,13 @@ const DeleteModalButton = ({ subId, subName, fetchTopics }: { subId: string, sub
         </DialogHeader>
         <DialogFooter>
           <Button onClick={deleteSubjectHandler}
-          disabled={loading}
+          disabled={loading||user.access==='limited'}
           className='font-semibold bg-gradient-to-b from-red-500 to-red-800 rounded-md shadow-sm p-2 hover:scale-105 transition-all duration-300'
           >
-            {
-              loading ? <Spinner/> : "Delete"
+            { 
+              user.access==='limited'
+              ? "Access Denied"
+              : loading ? <Spinner/> : "Delete"
             }
           </Button>
         </DialogFooter>

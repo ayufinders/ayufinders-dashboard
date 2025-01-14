@@ -25,6 +25,7 @@ import { useRouter, useParams } from 'next/navigation'
 import { Textarea } from '@/components/ui/textarea'
 import Spinner from '@/components/Spinner'
 import { ChevronRight, Trash } from 'lucide-react'
+import { useUserContext } from '@/context'
 
 const Papers = () => {
   const [papers, setPapers] = useState<PaperType[]>([])
@@ -289,6 +290,7 @@ const DeleteModalButton = ({ paperId, paperName, fetchTopics }: { paperId: strin
 
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
+  const {user} = useUserContext()
 
   const deletePaperHandler = async (paperId: string, paperName: string) => {
     try {
@@ -323,10 +325,12 @@ const DeleteModalButton = ({ paperId, paperName, fetchTopics }: { paperId: strin
         <DialogFooter>
           <Button onClick={() => deletePaperHandler(paperId, paperName)} 
             className='bg-gradient-to-b from-red-500 to-red-800 text-white font-medium rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 duration-300 transition-all'
-            disabled={loading}
+            disabled={loading||user.access==='limited'}
             >
-            {
-              loading? <Spinner /> : "Delete"
+            { 
+              user.access==='limited'
+              ? "Access Denied"
+              : loading? <Spinner /> : "Delete"
             }
           </Button>
         </DialogFooter>

@@ -26,6 +26,7 @@ import { useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Trash } from "lucide-react";
 import Spinner from "@/components/Spinner";
+import { useUserContext } from "@/context";
 
 const Quiz = () => {
   const [topics, setTopics] = useState<TopicType[]>([]);
@@ -238,6 +239,7 @@ const DeleteModalButton = ({
 }) => {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false)
+  const {user} = useUserContext()
 
   const deleteTopicHandler = async () => {
     try {
@@ -275,10 +277,12 @@ const DeleteModalButton = ({
           <Button
             className="bg-gradient-to-b from-red-500 to-red-700 text-white hover:scale-105 transition-all duration-300"
             onClick={deleteTopicHandler}
-            disabled={loading}
+            disabled={loading||user.access=='limited'}
           >
-            {
-              loading? <Spinner /> : "Delete"
+            { 
+              user.access=='limited'
+              ? "Access Denied"
+              : loading? <Spinner /> : "Delete"
             }
           </Button>
         </DialogFooter>
