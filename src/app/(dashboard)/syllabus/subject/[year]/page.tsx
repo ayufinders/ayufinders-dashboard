@@ -27,7 +27,6 @@ import { Textarea } from '@/components/ui/textarea'
 import { ChevronRight, Trash } from 'lucide-react'
 import Spinner from '@/components/Spinner'
 import { useUserContext } from '@/context'
-import { access } from 'fs'
 
 const Subject = () => {
   const [subjects, setSubjects] = useState<SubjectType[]>([])
