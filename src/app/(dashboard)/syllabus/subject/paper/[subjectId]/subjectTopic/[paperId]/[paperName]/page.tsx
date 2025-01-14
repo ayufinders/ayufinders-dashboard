@@ -45,7 +45,9 @@ const SubjectTopics = () => {
 
   const fetchTopics = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/subjectTopic/topics/${paperId}`)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/subjectTopic/topics/${paperId}`, {
+        withCredentials: true
+      })
       const topics = response.data.data
       setSubjectTopics(topics)
       setFilteredSubjectTopics(topics)
@@ -156,7 +158,8 @@ const AddSubjectTopic = ({ fetchTopics, paperId }: { fetchTopics: () => void, pa
         {
           headers: {
             'Content-Type': 'application/json'
-          }
+          }, 
+          withCredentials: true
         }
       )
 
@@ -255,7 +258,8 @@ const UpdateSubjectTopicDialog = ({ fetchTopics, subjectTopic }: { fetchTopics: 
         {
           headers: {
             'Content-Type': 'application/json'
-          }
+          },
+          withCredentials: true
         }
       )
 
@@ -288,7 +292,9 @@ const UpdateSubjectTopicDialog = ({ fetchTopics, subjectTopic }: { fetchTopics: 
 
   useEffect(() => {
     async function fetchTags() {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`, {
+        withCredentials: true
+      })
       const tags = response.data.tags
       setTags(tags)
     }
@@ -338,7 +344,9 @@ const DeleteModalButton = ({ topicId, topicName, fetchTopics }: { topicId: strin
   const deleteTopicHandler = async (topicId: string, topicName: string) => {
     try {
       setLoading(true)
-      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/subjectTopic/${topicId}`)
+      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/subjectTopic/${topicId}`, {
+        withCredentials: true
+      })
       toast({
         title: "Topic deleted.",
         description: `${topicName} has been successfully deleted.`

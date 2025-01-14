@@ -35,7 +35,10 @@ const Quiz = () => {
   const fetchTopics = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/`,
+        {
+          withCredentials: true
+        }
       );
       const topics = response.data.quizCategories;
       setTopics(topics);
@@ -162,7 +165,8 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
         {
           headers: {
             "Content-Type": "application/json",
-          }
+          },
+          withCredentials: true
         }
       );
       
@@ -239,7 +243,10 @@ const DeleteModalButton = ({
     try {
       setLoading(true)
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/category/${topicId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/category/${topicId}`,
+        {
+          withCredentials: true
+        }
       );
       toast({
         title: "Topic deleted",

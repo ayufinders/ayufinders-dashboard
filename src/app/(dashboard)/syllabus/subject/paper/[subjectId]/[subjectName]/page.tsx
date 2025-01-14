@@ -37,7 +37,9 @@ const Papers = () => {
 
   const fetchPapers = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/paper/${subjectId}`)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/paper/${subjectId}`, {
+        withCredentials: true
+      })
       const papers = response.data.data
       setPapers(papers)
       setFilteredPapers(papers)
@@ -149,7 +151,8 @@ const AddPaper = ({ fetchTopics, subjectId }: { fetchTopics: () => void, subject
         {
           headers: {
             'Content-Type': 'application/json'
-          }
+          },
+          withCredentials: true
         }
       )
 
@@ -226,7 +229,8 @@ const EditPaper = ({ fetchTopics, paper }: { fetchTopics: () => void, paper: Pap
         {
           headers: {
             'Content-Type': 'application/json'
-          }
+          },
+          withCredentials: true
         }
       )
 
@@ -289,7 +293,9 @@ const DeleteModalButton = ({ paperId, paperName, fetchTopics }: { paperId: strin
   const deletePaperHandler = async (paperId: string, paperName: string) => {
     try {
       setLoading(true)
-      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/paper/${paperId}`)
+      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/paper/${paperId}`, {
+        withCredentials: true
+      })
       toast({
         title: "Paper deleted.",
         description: `${paperName} has been successfully deleted.`

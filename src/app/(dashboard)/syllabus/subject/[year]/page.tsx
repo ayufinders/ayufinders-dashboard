@@ -37,7 +37,9 @@ const Subject = () => {
 
   const fetchSubjects = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/subject/${year}`)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/subject/${year}`, {
+        withCredentials: true
+      })
       const subjects = response.data.data
       setSubjects(subjects)
       setFilteredSubjects(subjects)
@@ -150,7 +152,8 @@ const AddSubject = ({ fetchTopics, year }: { fetchTopics: () => void, year: stri
         {
           headers: {
             'Content-Type': 'application/json'
-          }
+          }, 
+          withCredentials: true
         }
       )
       
@@ -222,7 +225,8 @@ const EditSubject = ({ fetchTopics, year, sub }: { fetchTopics: () => void, year
         {
           headers: {
             'Content-Type': 'application/json'
-          }
+          }, 
+          withCredentials: true
         }
       )
       
@@ -283,7 +287,9 @@ const DeleteModalButton = ({ subId, subName, fetchTopics }: { subId: string, sub
   const deleteSubjectHandler = async () => {
     try {
       setLoading(true)
-      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/subject/${subId}`)
+      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/subject/${subId}`, {
+        withCredentials: true
+      })
       toast({
         title: "Subject deleted.",
         description: `${subName} has been successfully deleted.`

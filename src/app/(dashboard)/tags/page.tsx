@@ -42,7 +42,9 @@ const Tags = () => {
 
   const fetchTags = async () => {
     try{
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag/`);
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag/`, {
+        withCredentials: true
+      });
       const tags = response.data.tags
       setTags(tags)
       setFilteredTags(tags)

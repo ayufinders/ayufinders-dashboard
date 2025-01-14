@@ -33,7 +33,9 @@ const SubjectTopicData = () => {
   const fetchQuestions = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/subjectTopic/${subjectTopicId}`
+        `${process.env.NEXT_PUBLIC_BASE_URL}/subjectTopic/${subjectTopicId}`, {
+          withCredentials: true
+        }
       );
       const data = response.data.data;
       setMcqQuestions(data.questions);

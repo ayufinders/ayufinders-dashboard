@@ -55,7 +55,9 @@ const TopicQuestions = () => {
   
   const fetchQuestions = async () => {
     try{
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${categoryId}`)
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${categoryId}`, {
+        withCredentials: true
+      })
       const questions = response.data.quiz
       setQuestions(questions)
       setFilteredQues(questions)
@@ -150,7 +152,9 @@ const DeleteModalButton = ({quesId, fetchQues}: {quesId: string, fetchQues: ()=>
   const deleteTopicHandler = async (quesId: string) => {
     try{
       
-      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${quesId}`)
+      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${quesId}`, {
+        withCredentials: true
+      })
       toast({
         title: "Question deleted.",
       })
@@ -237,7 +241,9 @@ const CreateQuestionDialog = ({categoryId, fetchQues}: {categoryId: string, fetc
   const [loading, setLoading] = useState(false)
 
   const fetchTags = async () => {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`)
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`, {
+      withCredentials: true
+    })
     const tags = response.data.tags
     setTags(tags)
   }
@@ -246,6 +252,8 @@ const CreateQuestionDialog = ({categoryId, fetchQues}: {categoryId: string, fetc
     const updatedTags = selectedTags.filter((tagId) => tagId !== id);
     setSelectedTags(updatedTags); 
   }
+
+  const {user} = useUserContext()
 
   const createQuestion = async () => {
     try{
@@ -279,11 +287,13 @@ const CreateQuestionDialog = ({categoryId, fetchQues}: {categoryId: string, fetc
           link: link
         },
         categoryId: categoryId,
-        tagId: selectedTags
+        tagId: selectedTags,
+        createdBy: user.id
       }, {
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        withCredentials: true
       })
 
       toast({
@@ -506,7 +516,9 @@ const UpdateQuestionDialog = ({question, fetchQues}: {question: QuestionType, fe
   const [loading, setLoading] = useState(false)
 
   const fetchTags = async () => {
-    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`)
+    const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`, {
+      withCredentials: true
+    })
     const tags = response.data.tags
     setTags(tags)
   }
@@ -551,7 +563,8 @@ const UpdateQuestionDialog = ({question, fetchQues}: {question: QuestionType, fe
       }, {
         headers: {
           'Content-Type': 'application/json'
-        }
+        }, 
+        withCredentials: true
       })
       
       toast({
