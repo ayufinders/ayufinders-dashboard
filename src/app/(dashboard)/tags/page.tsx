@@ -157,7 +157,7 @@ const AddTag = ({fetchTags}: {fetchTags: ()=>void}) => {
   </Dialog>
 }
 
-const EditTag = ({fetchTags}: {fetchTags: ()=>void}) => {
+const EditTag = ({fetchTags, tag}: {fetchTags: ()=>void, tag: tagType}) => {
 
   const [tagName, setTagName] = useState("")
   const [tagDesc, setTagDesc] = useState("")
@@ -174,7 +174,7 @@ const EditTag = ({fetchTags}: {fetchTags: ()=>void}) => {
           variant: "destructive"
         })
       }
-      const response = await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/tag/`, 
+      const response = await axios.put(`${process.env.NEXT_PUBLIC_BASE_URL}/tag/${tag._id}`, 
         {
           name: tagName,
           description: tagDesc
@@ -273,6 +273,7 @@ const TagList = ({tags, fetchTags}: {tags: tagType[], fetchTags: ()=>void}) => {
         <TableCell><div className='bg-gray-100 p-1 rounded-lg w-fit'>{tag.createdBy?.name || ''}</div></TableCell>
         <TableCell>{tag.questions?.length}</TableCell>
         <TableCell>
+          <EditTag fetchTags={fetchTags} tag={tag}/>
           <DeleteModalButton fetchTags={fetchTags} tagId={tag._id} tagName={tag.name}/>
         </TableCell>
       </TableRow>
