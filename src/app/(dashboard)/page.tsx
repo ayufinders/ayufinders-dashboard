@@ -32,7 +32,9 @@ const Dashboard = () => {
       <div className='flex flex-row gap-2 mt-4'>
         {items.map(item => (
           <div key={item.title}>
-            <Button onClick={()=>{router.push(`${item.path}`)}}>
+            <Button onClick={()=>{router.push(`${item.path}`)}}
+              className='bg-gradient-to-b from-gray-500 to-gray-900 px-6 py-2 font-semibold cursor-pointer hover:scale-105 transition-all duration-300'
+              >
               {item.title}
               <item.icon></item.icon>
             </Button>

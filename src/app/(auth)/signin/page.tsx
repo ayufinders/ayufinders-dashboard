@@ -17,7 +17,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/user/admin-signin`, 
+      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/admin-signin`, 
         { 
           email, 
           password 
@@ -33,19 +33,14 @@ export default function LoginPage() {
           loggedIn: true,
           access: response.data.admin.access,
         }
-
         setUser(user)
         localStorage.setItem("user", JSON.stringify(user));
         // Redirect to the dashboard
         router.push('/');
-      }
+      } 
     } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message || 'An error occurred during login');
-      } else {
-        console.error("Unknown error:", error);
-      }
-      
+      console.log(err)
+      setError("Invalid email or password")
     }
   };
 

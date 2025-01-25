@@ -19,6 +19,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -27,6 +28,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Trash } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
+import { Label } from "@/components/ui/label";
 
 const Quiz = () => {
   const [topics, setTopics] = useState<TopicType[]>([]);
@@ -36,7 +38,7 @@ const Quiz = () => {
   const fetchTopics = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz`,
         {
           withCredentials: true
         }
@@ -75,7 +77,7 @@ const Quiz = () => {
           </div>
         </div>
       </div>
-      <section className="max-h-[75vh] min-w-[80vw] overflow-scroll-y border">
+      <section className="max-h-[75vh] min-w-[80vw] overflow-scroll-y">
         <QuizCategories topics={filteredTopics} fetchTopics={fetchTopics} />
       </section>
     </main>
@@ -102,7 +104,7 @@ const QuizCategories = ({
   const router = useRouter();
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto max-h-[80vh]">
       <Table className="shadow-sm border border-gray-200">
         <TableHeader className="bg-gray-100">
           <TableRow>
@@ -158,6 +160,7 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
   const [topicDesc, setTopicDesc] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false)
+  const [year, setYear] = useState("1")
 
   const addTopicHandler = async () => {
     try {
@@ -167,6 +170,7 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
         {
           name: topicName,
           description: topicDesc,
+          year: year
         },
         {
           headers: {
@@ -191,6 +195,7 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
     } finally {
       setTopicName("");
       setTopicDesc("");
+      setYear("")
       setLoading(false)
     }
   };
@@ -216,7 +221,14 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
             rows={3}
             placeholder="Topic Description (optional)"
           />
+          <Label className="mt-4">Select Year</Label>
+          <ToggleGroup type="single" value={year} onValueChange={setYear} className="justify-start">
+            <ToggleGroupItem value="1">1</ToggleGroupItem>
+            <ToggleGroupItem value="2">2</ToggleGroupItem>
+            <ToggleGroupItem value="3">3</ToggleGroupItem>
+          </ToggleGroup>
         </div>
+
         <DialogFooter>
           <Button
             className="bg-gradient-to-b from-gray-600 to-gray-900 text-white hover:scale-105 font-semibold transition-all duration-300"
@@ -243,7 +255,7 @@ const EditTopic = ({ fetchTopics, topic }: { fetchTopics: () => void, topic: Top
     try {
       setLoading(true)
       const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${topic._id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/category/${topic._id}`,
         {
           name: topicName,
           description: topicDesc,
@@ -305,7 +317,7 @@ const EditTopic = ({ fetchTopics, topic }: { fetchTopics: () => void, topic: Top
             disabled={loading}
           >
             { 
-              loading? <Spinner /> : "Add Topic"
+              loading? <Spinner /> : "Edit Topic"
             }
           </Button>
         </DialogFooter>

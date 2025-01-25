@@ -63,7 +63,7 @@ const Papers = () => {
 
   return (
     <main className='p-4 sm:w-[90vw] md:w-[80vw] lg:min-w-[80vw] mx-auto'>
-      <div className='sticky z-50 top-0 bg-white'>
+      <div className='sticky top-0 bg-white'>
         <div className='flex flex-row justify-between items-center p-4'>
           <p className='font-bold text-3xl'>{subjectName}</p>
           <div className='flex flex-row gap-2'>
@@ -79,7 +79,7 @@ const Papers = () => {
         </div>
       </div>
 
-      <section className='min-w-[80vw] max-h-[75vh] overflow-y-scroll border'>
+      <section className='min-w-[80vw] max-h-[80vh] overflow-y-scroll border'>
         <PaperList papers={filteredPapers} fetchTopics={fetchPapers} />
       </section>
     </main>
@@ -117,7 +117,7 @@ const PaperList = ({ papers, fetchTopics }: { papers: PaperType[], fetchTopics: 
             <TableCell className='flex gap-2'>
               <Button
                 onClick={() => {
-                  router.push(`subjectTopic/${sub._id}/${sub.name}`)
+                  router.push(`/syllabus/subject/paper/subjectTopic/${sub._id}/${sub.name}`)
                 }}
                 className='bg-gradient-to-b from-gray-600 to-gray-900 rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 duration-300 transition-all'
               >

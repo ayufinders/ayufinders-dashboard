@@ -18,14 +18,7 @@ import {
   DialogDescription,
   DialogFooter
 } from "@/components/ui/dialog"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu"
+
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { useToast } from '@/hooks/use-toast'
@@ -34,19 +27,21 @@ import { Textarea } from '@/components/ui/textarea'
 import { ChevronRight, Trash } from 'lucide-react' // Importing icons
 import Spinner from '@/components/Spinner'
 import { useUserContext } from '@/context'
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
+import { Label } from '@/components/ui/label'
 
-const SubjectTopics = () => {
+const PaperSectionSubjectTopics = () => {
   const [subjectTopics, setSubjectTopics] = useState<SubjectTopicType[]>([])
   const [filteredSubjectTopics, setFilteredSubjectTopics] = useState<SubjectTopicType[]>([])
   const [search, setSearch] = useState("")
 
   const params = useParams();
-  const paperId = params.paperId;
-  const paperName = decodeURIComponent(params.paperName as string);
+  const paperSectionId = params.paperSectionId;
+  const paperSectionName = decodeURIComponent(params.paperSectionName as string);
 
   const fetchTopics = async () => {
     try {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/subjectTopic/topics/${paperId}`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/paperSection/topics/${paperSectionId}`, {
         withCredentials: true
       })
       const topics = response.data.data
@@ -57,10 +52,12 @@ const SubjectTopics = () => {
     }
   }
 
+
   useEffect(() => {
     const filteredTopics = subjectTopics.filter(
       topic => topic.name.toLowerCase().includes(search)
     )
+
     setFilteredSubjectTopics(filteredTopics)
   }, [search, subjectTopics])
 
@@ -71,34 +68,26 @@ const SubjectTopics = () => {
 
   return (
     <main className='p-4 min-w-[80vw]'>
-      <div className='sticky z-50 top-0 bg-white'>
+      <div className='sticky top-0 bg-white'>
         <div className='flex flex-row justify-between items-center p-4'>
-          <p className='font-bold text-3xl'>{paperName}</p>
+          <p className='font-bold text-3xl'>{paperSectionName}</p>
           <div className='flex flex-row gap-2'>
             <div>
               <Input onChange={(e) => { setSearch(e.target.value) }} className='p-2' placeholder="Search for topics..."></Input>
             </div>
-            <AddSubjectTopic fetchTopics={fetchTopics} paperId={paperId as string} />
+            <AddSubjectTopic fetchTopics={fetchTopics} paperSectionId={paperSectionId as string} />
           </div>
         </div>
       </div>
 
-      <section className='max-h-[75vh] min-w-[80vw] border'>
+      <section className='max-h-[80vh] min-w-[80vw] border'>
       <SubjectTopicList topics={filteredSubjectTopics} fetchTopics={fetchTopics} />
       </section>
+
     </main>
   )
 }
 
-type SubjectTopicType = {
-  _id: string
-  name: string,
-  description: string,
-  paperId: string,
-  tagId: string[],
-  createdAt: string,
-  updatedAt: string,
-}
 
 const SubjectTopicList = ({ topics, fetchTopics }: { topics: SubjectTopicType[], fetchTopics: () => void }) => {
 
@@ -122,7 +111,7 @@ const SubjectTopicList = ({ topics, fetchTopics }: { topics: SubjectTopicType[],
           <TableCell className='flex flex-row gap-2'>
             <Button
               onClick={() => {
-                router.push(`data/${sub._id}/${sub.name}`)
+                router.replace(`/syllabus/subject/paper/subjectTopic/subTopic/${sub._id}/${sub.name}`)
               }}
               className='flex items-center gap-2 bg-gradient-to-b from-gray-600 to-gray-900 hover:scale-105 transition-all duration-300'
             >
@@ -130,7 +119,7 @@ const SubjectTopicList = ({ topics, fetchTopics }: { topics: SubjectTopicType[],
               <ChevronRight size={16} />
             </Button>
             <UpdateSubjectTopicDialog fetchTopics={fetchTopics} subjectTopic={sub}></UpdateSubjectTopicDialog>
-            <DeleteModalButton topicId={sub._id} topicName={sub.name} fetchTopics={fetchTopics} />
+            <DeleteSubjectTopicModalButton topicId={sub._id} topicName={sub.name} fetchTopics={fetchTopics} />
 
           </TableCell>
         </TableRow>
@@ -139,10 +128,12 @@ const SubjectTopicList = ({ topics, fetchTopics }: { topics: SubjectTopicType[],
   </Table>
 }
 
-const AddSubjectTopic = ({ fetchTopics, paperId }: { fetchTopics: () => void, paperId: string }) => {
+
+const AddSubjectTopic = ({ fetchTopics, paperSectionId }: { fetchTopics: () => void, paperSectionId: string }) => {
 
   const [subjectTopicName, setSubjectTopicName] = useState("");
   const [subjectTopicDesc, setSubjectTopicDesc] = useState("");
+  const [year, setYear] = useState("")
   const { toast } = useToast();
   const [loading, setLoading] = useState(false)
 
@@ -153,8 +144,8 @@ const AddSubjectTopic = ({ fetchTopics, paperId }: { fetchTopics: () => void, pa
         {
           name: subjectTopicName,
           description: subjectTopicDesc,
-          paperId: paperId,
-          tagId: selectedTags
+          paperSectionId: paperSectionId,
+          year
         },
         {
           headers: {
@@ -184,22 +175,10 @@ const AddSubjectTopic = ({ fetchTopics, paperId }: { fetchTopics: () => void, pa
     } finally {
       setSubjectTopicName("")
       setSubjectTopicDesc("")
+      setYear("")
       setLoading(false)
     }
   }
-
-  const [tags, setTags] = useState<TagType[]>([])
-  const [selectedTags, setSelectedTags] = useState<TagType[]>([])
-
-  useEffect(() => {
-    async function fetchTags() {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`)
-      const tags = response.data.tags
-      setTags(tags)
-    }
-
-    fetchTags()
-  }, [])
 
   return <Dialog>
     <DialogTrigger className='bg-gradient-to-b from-gray-600 to-gray-900 text-white rounded-md shadow-sm p-2 px-4 text-sm text-nowrap font-semibold hover:scale-105 duration-300 transition-all'>
@@ -212,16 +191,12 @@ const AddSubjectTopic = ({ fetchTopics, paperId }: { fetchTopics: () => void, pa
       <div className='flex flex-col gap-2'>
         <Input value={subjectTopicName} onChange={(e) => { setSubjectTopicName(e.target.value) }} type="text" placeholder="Subject Name"></Input>
         <Textarea value={subjectTopicDesc} onChange={(e) => { setSubjectTopicDesc(e.target.value) }} rows={2} placeholder="Subject Description (optional)"></Textarea>
-        <div className='flex flex-row gap-4'>
-          <TagsMenu selectedTags={selectedTags} tags={tags} setSelectedTags={setSelectedTags} />
-          <div className='w-[350px] overflow-x-scroll p-1 border flex-row flex gap-1'>
-            {selectedTags.map(tag => {
-              return <div key={tag._id} className='bg-gray-100 py-1 px-2 rounded-md text-nowrap'>
-                {tag.name}
-              </div>
-            })}
-          </div>
-        </div>
+        <Label className='mt-4'>Select Year</Label>
+        <ToggleGroup type="single" value={year} onValueChange={setYear} className="justify-start">
+          <ToggleGroupItem value="1">1</ToggleGroupItem>
+          <ToggleGroupItem value="2">2</ToggleGroupItem>
+          <ToggleGroupItem value="3">3</ToggleGroupItem>
+        </ToggleGroup>
       </div>
       <DialogFooter>
         <Button type='submit' onClick={addSubjectTopicHandler}
@@ -236,6 +211,7 @@ const AddSubjectTopic = ({ fetchTopics, paperId }: { fetchTopics: () => void, pa
   </Dialog>
 }
 
+
 const UpdateSubjectTopicDialog = ({ fetchTopics, subjectTopic }: { fetchTopics: () => void, subjectTopic: SubjectTopicType }) => {
 
   const [subjectTopicName, setSubjectTopicName] = useState(subjectTopic.name);
@@ -244,7 +220,7 @@ const UpdateSubjectTopicDialog = ({ fetchTopics, subjectTopic }: { fetchTopics: 
   const [loading, setLoading] = useState(false)
 
   const params = useParams();
-  const paperId = params.paperId;
+  const paperSectionId = params.paperSectionId;
 
   const updateSubjectTopicHandler = async () => {
     try {
@@ -253,8 +229,7 @@ const UpdateSubjectTopicDialog = ({ fetchTopics, subjectTopic }: { fetchTopics: 
         {
           name: subjectTopicName,
           description: subjectTopicDesc,
-          paperId: paperId,
-          tagId: selectedTags
+          paperSectionId: paperSectionId,
         },
         {
           headers: {
@@ -288,20 +263,6 @@ const UpdateSubjectTopicDialog = ({ fetchTopics, subjectTopic }: { fetchTopics: 
     }
   }
 
-  const [tags, setTags] = useState<TagType[]>([])
-  const [selectedTags, setSelectedTags] = useState<TagType[]>([])
-
-  useEffect(() => {
-    async function fetchTags() {
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`, {
-        withCredentials: true
-      })
-      const tags = response.data.tags
-      setTags(tags)
-    }
-
-    fetchTags()
-  }, [])
 
   return <Dialog>
     <DialogTrigger className='flex flex-row gap-2 items-center bg-gradient-to-b from-gray-600 to-gray-900 text-white font-medium rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 duration-300 transition-all'>
@@ -315,16 +276,6 @@ const UpdateSubjectTopicDialog = ({ fetchTopics, subjectTopic }: { fetchTopics: 
       <div className='flex flex-col gap-2'>
         <Input defaultValue={subjectTopicName} onChange={(e) => { setSubjectTopicName(e.target.value) }} type="text" placeholder="Subject Name"></Input>
         <Textarea defaultValue={subjectTopicDesc} onChange={(e) => { setSubjectTopicDesc(e.target.value) }} rows={2} placeholder="Subject Description (optional)"></Textarea>
-        <div className='flex flex-row gap-4'>
-          <TagsMenu selectedTags={selectedTags} tags={tags} setSelectedTags={setSelectedTags} />
-          <div className='w-80 overflow-x-scroll p-1 border flex-row flex gap-1'>
-            {selectedTags.map(tag => {
-              return <div key={tag._id} className='bg-gray-100 py-1 px-2 rounded-md text-nowrap'>
-                {tag.name}
-              </div>
-            })}
-          </div>
-        </div>
       </div>
       <DialogFooter>
         <Button type='submit' disabled={loading} onClick={updateSubjectTopicHandler}>
@@ -337,7 +288,7 @@ const UpdateSubjectTopicDialog = ({ fetchTopics, subjectTopic }: { fetchTopics: 
   </Dialog>
 }
 
-const DeleteModalButton = ({ topicId, topicName, fetchTopics }: { topicId: string, topicName: string, fetchTopics: () => void }) => {
+const DeleteSubjectTopicModalButton = ({ topicId, topicName, fetchTopics }: { topicId: string, topicName: string, fetchTopics: () => void }) => {
 
   const { toast } = useToast()
   const [loading, setLoading] = useState(false)
@@ -388,33 +339,15 @@ const DeleteModalButton = ({ topicId, topicName, fetchTopics }: { topicId: strin
   </Dialog>
 }
 
-const TagsMenu = ({ tags, selectedTags, setSelectedTags }: { tags: TagType[], selectedTags: TagType[], setSelectedTags: (x: TagType[]) => void }) => {
-  const addTag = (tag: TagType) => {
-    if (!selectedTags.includes(tag)) {
-      setSelectedTags([...selectedTags, tag]);
-    }
-  }
-
-  return <DropdownMenu>
-    <DropdownMenuTrigger className='border p-2 px-4 rounded-md text-sm'>Select</DropdownMenuTrigger>
-    <DropdownMenuContent>
-      <DropdownMenuLabel>Tags</DropdownMenuLabel>
-      <DropdownMenuSeparator />
-      {tags.map(item => {
-        return <DropdownMenuItem key={item.name}
-          onClick={() => {
-            addTag(item)
-          }}
-        >{item.name}</DropdownMenuItem>
-      })}
-    </DropdownMenuContent>
-  </DropdownMenu>
-}
-
-type TagType = {
-  _id: string,
+type SubjectTopicType = {
+  _id: string
   name: string,
-  description: string
+  description: string,
+  paperId: string,
+  tagId: string[],
+  createdAt: string,
+  updatedAt: string,
 }
 
-export default SubjectTopics;
+
+export default PaperSectionSubjectTopics;

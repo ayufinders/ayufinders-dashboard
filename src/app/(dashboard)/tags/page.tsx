@@ -42,7 +42,7 @@ const Tags = () => {
 
   const fetchTags = async () => {
     try{
-      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag/`, {
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/tag`, {
         withCredentials: true
       });
       const tags = response.data.tags
@@ -58,7 +58,7 @@ const Tags = () => {
 
   return (
     <main className='p-4 relative'>
-      <div className='sticky z-50 top-0 p-4'>
+      <div className='sticky top-0 p-4'>
         <div className='flex flex-row justify-between items-center gap-2'>
           <p className='font-bold text-4xl text-gray-900'>Tags</p>
           <div className='flex flex-row gap-2 items-center'>
@@ -70,7 +70,7 @@ const Tags = () => {
         </div>
       </div>
       
-      <section className='max-h-[75vh] min-w-[80vw] overflow-y-scroll border mt-2'>
+      <section className='max-h-[80vh] min-w-[80vw] overflow-y-scroll border mt-2'>
         <TagList tags={filteredTags} fetchTags={fetchTags}/>
       </section>
     </main>
@@ -255,7 +255,7 @@ const TagList = ({tags, fetchTags}: {tags: tagType[], fetchTags: ()=>void}) => {
 
 
   return <Table>
-  <TableHeader className='bg-gray-50'>
+  <TableHeader className='bg-gray-50 max-h-[80vh]'>
     <TableRow>
       <TableHead className="w-[100px]">S. No.</TableHead>
       <TableHead>Name</TableHead>

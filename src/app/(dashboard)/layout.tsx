@@ -7,11 +7,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
   return (
     
     <SidebarProvider>
-      
       <AppSidebar />
       <main>
-        <Toaster />
         <SidebarTrigger />
+        <Toaster />
         {children}
       </main>
       

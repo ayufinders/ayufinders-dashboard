@@ -63,7 +63,7 @@ const Subject = () => {
   
   return (
     <main className='p-4 sm:w-[90vw] md:w-[80vw] lg:min-w-[80vw] mx-auto'>
-      <div className='sticky top-0 z-50'>
+      <div className='sticky top-0'>
         <div className='flex flex-row justify-between items-center p-4'>
           <p className='font-bold text-3xl'>Year {year}</p>
           <div className='flex flex-row gap-2'>
@@ -78,7 +78,7 @@ const Subject = () => {
           </div>
         </div>
       </div>
-      <section className='min-w-[80vw] max-h-[75vh] overflow-y-scroll border'>
+      <section className='min-w-[80vw] max-h-[80vh] overflow-y-scroll border'>
         <SubjectList subjects={filteredSubjects} fetchTopics={fetchSubjects} />
       </section>
     </main>
@@ -101,7 +101,7 @@ const SubjectList = ({ subjects, fetchTopics }: { subjects: SubjectType[], fetch
 
   return (
     <Table className='w-full'>
-      <TableHeader className='bg-gray-50'>
+      <TableHeader className='bg-gray-50 max-h-[80vh]'>
         <TableRow>
           <TableHead className="w-[100px]">S. No.</TableHead>
           <TableHead>Name</TableHead>
