@@ -40,7 +40,10 @@ const Quiz = () => {
       const response = await axios.get(
         `${process.env.NEXT_PUBLIC_BASE_URL}/quiz`,
         {
-          withCredentials: true
+          withCredentials: true,
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          }
         }
       );
       const topics = response.data.quizCategories;
@@ -100,7 +103,6 @@ const QuizCategories = ({
   topics: TopicType[];
   fetchTopics: () => void;
 }) => {
-  
   const router = useRouter();
 
   return (
@@ -111,9 +113,10 @@ const QuizCategories = ({
             <TableHead className="w-[50px] text-gray-700">#</TableHead>
             <TableHead className="text-gray-700">Name</TableHead>
             <TableHead className="text-gray-700">Description</TableHead>
-            <TableHead className="text-gray-700 text-right">Questions</TableHead>
+            <TableHead className="text-gray-700 text-right">
+              Questions
+            </TableHead>
             <TableHead></TableHead>
-            
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -122,8 +125,12 @@ const QuizCategories = ({
               <TableCell className="font-medium text-gray-800">
                 {index + 1}
               </TableCell>
-              <TableCell className="text-gray-800 font-medium">{topic.name}</TableCell>
-              <TableCell className="text-gray-600">{topic.description}</TableCell>
+              <TableCell className="text-gray-800 font-medium">
+                {topic.name}
+              </TableCell>
+              <TableCell className="text-gray-600">
+                {topic.description}
+              </TableCell>
               <TableCell className="text-gray-800 text-center">
                 {topic.questions.length}
               </TableCell>
@@ -131,22 +138,19 @@ const QuizCategories = ({
                 <Button
                   className="bg-gradient-to-b from-gray-500 to-gray-800 text-white hover:scale-105 px-4 py-0 transition-all duration-300"
                   onClick={() => router.push(`quiz/${topic._id}/${topic.name}`)}
-                > View
-                  <ChevronRight size={24} color="white" className="font-bold"/>
+                >
+                  {" "}
+                  View
+                  <ChevronRight size={24} color="white" className="font-bold" />
                 </Button>
 
-                <EditTopic
-                fetchTopics={fetchTopics}
-                topic={topic}
-                />
+                <EditTopic fetchTopics={fetchTopics} topic={topic} />
                 <DeleteModalButton
                   topicId={topic._id}
                   topicName={topic.name}
                   fetchTopics={fetchTopics}
                 />
-
               </TableCell>
-              
             </TableRow>
           ))}
         </TableBody>
@@ -159,31 +163,30 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
   const [topicName, setTopicName] = useState("");
   const [topicDesc, setTopicDesc] = useState("");
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false)
-  const [year, setYear] = useState("1")
+  const [loading, setLoading] = useState(false);
+  const [year, setYear] = useState("1");
 
   const addTopicHandler = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/`,
         {
           name: topicName,
           description: topicDesc,
-          year: year
+          year: year,
         },
         {
           headers: {
             "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
           },
-          withCredentials: true
+          withCredentials: true,
         }
       );
-      
+
       toast({
-        title: response.data.success
-          ? "Topic created"
-          : "Topic not created",
+        title: response.data.success ? "Topic created" : "Topic not created",
         description: response.data.success
           ? `${topicName} successfully created.`
           : `${topicName} already exists.`,
@@ -195,8 +198,8 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
     } finally {
       setTopicName("");
       setTopicDesc("");
-      setYear("")
-      setLoading(false)
+      setYear("");
+      setLoading(false);
     }
   };
 
@@ -207,7 +210,9 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle className="my-2 text-gray-700">Create a New Topic</DialogTitle>
+          <DialogTitle className="my-2 text-gray-700">
+            Create a New Topic
+          </DialogTitle>
         </DialogHeader>
         <div className="flex flex-col gap-2">
           <Input
@@ -222,7 +227,12 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
             placeholder="Topic Description (optional)"
           />
           <Label className="mt-4">Select Year</Label>
-          <ToggleGroup type="single" value={year} onValueChange={setYear} className="justify-start">
+          <ToggleGroup
+            type="single"
+            value={year}
+            onValueChange={setYear}
+            className="justify-start"
+          >
             <ToggleGroupItem value="1">1</ToggleGroupItem>
             <ToggleGroupItem value="2">2</ToggleGroupItem>
             <ToggleGroupItem value="3">3</ToggleGroupItem>
@@ -235,9 +245,7 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
             onClick={addTopicHandler}
             disabled={loading}
           >
-            {
-              loading? <Spinner /> : "Add Topic"
-            }
+            {loading ? <Spinner /> : "Add Topic"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -245,15 +253,21 @@ const AddTopic = ({ fetchTopics }: { fetchTopics: () => void }) => {
   );
 };
 
-const EditTopic = ({ fetchTopics, topic }: { fetchTopics: () => void, topic: TopicType }) => {
+const EditTopic = ({
+  fetchTopics,
+  topic,
+}: {
+  fetchTopics: () => void;
+  topic: TopicType;
+}) => {
   const [topicName, setTopicName] = useState("");
   const [topicDesc, setTopicDesc] = useState("");
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const editTopicHandler = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/category/${topic._id}`,
         {
@@ -263,15 +277,14 @@ const EditTopic = ({ fetchTopics, topic }: { fetchTopics: () => void, topic: Top
         {
           headers: {
             "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
           },
-          withCredentials: true
+          withCredentials: true,
         }
       );
-      
+
       toast({
-        title: response.data.success
-          ? "Topic updated"
-          : "Topic not updated",
+        title: response.data.success ? "Topic updated" : "Topic not updated",
         description: response.data.success
           ? `${topicName} successfully updated.`
           : `${topicName} does not exist.`,
@@ -283,15 +296,16 @@ const EditTopic = ({ fetchTopics, topic }: { fetchTopics: () => void, topic: Top
     } finally {
       setTopicName("");
       setTopicDesc("");
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button className='bg-gradient-to-b from-gray-500 to-gray-800 px-4 py-1 hover:scale-105 transition-all duration-300'>
-          Edit <ChevronRight size={20}/></Button>
+        <Button className="bg-gradient-to-b from-gray-500 to-gray-800 px-4 py-1 hover:scale-105 transition-all duration-300">
+          Edit <ChevronRight size={20} />
+        </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -316,17 +330,13 @@ const EditTopic = ({ fetchTopics, topic }: { fetchTopics: () => void, topic: Top
             onClick={editTopicHandler}
             disabled={loading}
           >
-            { 
-              loading? <Spinner /> : "Edit Topic"
-            }
+            {loading ? <Spinner /> : "Edit Topic"}
           </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
   );
 };
-
-
 
 const DeleteModalButton = ({
   topicId,
@@ -338,16 +348,19 @@ const DeleteModalButton = ({
   fetchTopics: () => void;
 }) => {
   const { toast } = useToast();
-  const [loading, setLoading] = useState(false)
-  const {user} = useUserContext()
+  const [loading, setLoading] = useState(false);
+  const { user } = useUserContext();
 
   const deleteTopicHandler = async () => {
     try {
-      setLoading(true)
+      setLoading(true);
       await axios.delete(
         `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/category/${topicId}`,
         {
-          withCredentials: true
+          withCredentials: true,
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          }
         }
       );
       toast({
@@ -357,33 +370,36 @@ const DeleteModalButton = ({
       fetchTopics();
     } catch (error) {
       console.error(error);
-      setLoading(false)
+      setLoading(false);
     }
   };
 
   return (
     <Dialog>
       <DialogTrigger className="bg-gradient-to-b from-red-500 to-red-700 text-white rounded-md p-2 shadow-md hover:scale-105 transition-all duration-300">
-        <Trash size={16}/>
+        <Trash size={16} />
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Are you sure?</DialogTitle>
           <DialogDescription>
-            This action cannot be undone. This will permanently delete the topic.
+            This action cannot be undone. This will permanently delete the
+            topic.
           </DialogDescription>
         </DialogHeader>
         <DialogFooter>
           <Button
             className="bg-gradient-to-b from-red-500 to-red-700 text-white hover:scale-105 transition-all duration-300"
             onClick={deleteTopicHandler}
-            disabled={loading||user.access=='limited'}
+            disabled={loading || user.access == "limited"}
           >
-            { 
-              user.access=='limited'
-              ? "Access Denied"
-              : loading? <Spinner /> : "Delete"
-            }
+            {user.access == "limited" ? (
+              "Access Denied"
+            ) : loading ? (
+              <Spinner />
+            ) : (
+              "Delete"
+            )}
           </Button>
         </DialogFooter>
       </DialogContent>

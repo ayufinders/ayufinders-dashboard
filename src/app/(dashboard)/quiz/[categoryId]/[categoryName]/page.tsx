@@ -60,6 +60,9 @@ const TopicQuestions = () => {
         `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${categoryId}`,
         {
           withCredentials: true,
+          headers: {
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          }
         }
       );
       const questions = response.data.quiz;
@@ -191,6 +194,9 @@ const DeleteModalButton = ({
     try {
       await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${quesId}`, {
         withCredentials: true,
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem("token")
+        }
       });
       toast({
         title: "Question deleted.",
@@ -319,6 +325,9 @@ const CreateQuestionDialog = ({
       `${process.env.NEXT_PUBLIC_BASE_URL}/tag`,
       {
         withCredentials: true,
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem("token")
+        }
       }
     );
     const tags = response.data.tags;
@@ -392,6 +401,7 @@ const CreateQuestionDialog = ({
         {
           headers: {
             "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
           },
           withCredentials: true,
         }
@@ -406,7 +416,7 @@ const CreateQuestionDialog = ({
     } finally {
       setLoading(false);
       setQuesText("");
-      setQuesTextHindi("")
+      setQuesTextHindi("");
       setOp1("");
       setOp2("");
       setOp3("");
@@ -419,7 +429,7 @@ const CreateQuestionDialog = ({
       setExplanation("");
       setExplanationHindi("");
       setLink("");
-      setLinkHindi("")
+      setLinkHindi("");
       setRefTitle("");
       setRefTitleHindi("");
       setSelectedTags([]);
@@ -434,7 +444,6 @@ const CreateQuestionDialog = ({
   const handleToggle = (value: string) => {
     setCorrectOp(Number(value));
   };
-
 
   return (
     <Dialog>
@@ -452,51 +461,55 @@ const CreateQuestionDialog = ({
         </DialogHeader>
         <div className="flex flex-row gap-4 justify-evenly w-full">
           <div className="w-full">
-          <div className="font-semibold bg-gradient-to-b from-gray-400 to-gray-600 text-white p-2">English</div>
-          <QuestionForm 
-                quesText={quesText}
-                op1={op1}
-                op2={op2}
-                op3={op3}
-                op4={op4}
-                explanation={explanation}
-                refTitle={refTitle}
-                link={link}
-                setQuesText={setQuesText}
-                setOp1={setOp1}
-                setOp2={setOp2}
-                setOp3={setOp3}
-                setOp4={setOp4}
-                setExplanation={setExplanation}
-                setRefTitle={setRefTitle}
-                setLink={setLink}
-                fetchQues={fetchQues}
-                setLoading={setLoading}
-              />
+            <div className="font-semibold bg-gradient-to-b from-gray-400 to-gray-600 text-white p-2">
+              English
+            </div>
+            <QuestionForm
+              quesText={quesText}
+              op1={op1}
+              op2={op2}
+              op3={op3}
+              op4={op4}
+              explanation={explanation}
+              refTitle={refTitle}
+              link={link}
+              setQuesText={setQuesText}
+              setOp1={setOp1}
+              setOp2={setOp2}
+              setOp3={setOp3}
+              setOp4={setOp4}
+              setExplanation={setExplanation}
+              setRefTitle={setRefTitle}
+              setLink={setLink}
+              fetchQues={fetchQues}
+              setLoading={setLoading}
+            />
           </div>
 
           <div className="w-full">
-            <div className="font-semibold bg-gradient-to-b from-gray-400 to-gray-600 text-white p-2">Hindi</div>
+            <div className="font-semibold bg-gradient-to-b from-gray-400 to-gray-600 text-white p-2">
+              Hindi
+            </div>
             <QuestionFormHindi
-                quesText={quesTextHindi}
-                op1={op1Hindi}
-                op2={op2Hindi}
-                op3={op3Hindi}
-                op4={op4Hindi}
-                explanation={explanationHindi}
-                refTitle={refTitleHindi}
-                link={linkHindi}
-                setQuesText={setQuesTextHindi}
-                setOp1={setOp1Hindi}
-                setOp2={setOp2Hindi}
-                setOp3={setOp3Hindi}
-                setOp4={setOp4Hindi}
-                setExplanation={setExplanationHindi}
-                setRefTitle={setRefTitleHindi}
-                setLink={setLinkHindi}
-                fetchQues={fetchQues}
-                setLoading={setLoading}
-              />
+              quesText={quesTextHindi}
+              op1={op1Hindi}
+              op2={op2Hindi}
+              op3={op3Hindi}
+              op4={op4Hindi}
+              explanation={explanationHindi}
+              refTitle={refTitleHindi}
+              link={linkHindi}
+              setQuesText={setQuesTextHindi}
+              setOp1={setOp1Hindi}
+              setOp2={setOp2Hindi}
+              setOp3={setOp3Hindi}
+              setOp4={setOp4Hindi}
+              setExplanation={setExplanationHindi}
+              setRefTitle={setRefTitleHindi}
+              setLink={setLinkHindi}
+              fetchQues={fetchQues}
+              setLoading={setLoading}
+            />
           </div>
         </div>
 
@@ -506,7 +519,7 @@ const CreateQuestionDialog = ({
             <Label htmlFor="correct" className="text-nowrap">
               Correct Option*
             </Label>
-            
+
             <ToggleGroup type="single" onValueChange={handleToggle}>
               <ToggleGroupItem value="1" aria-label="Toggle 1">
                 1
@@ -555,17 +568,22 @@ const CreateQuestionDialog = ({
                             x
                           </div>
                         </div>
-                      )}});
-                    })}
-                  </div>
-                </div>
+                      );
+                    }
+                  });
+                })}
               </div>
+            </div>
           </div>
+        </div>
 
         <DialogFooter>
-          <Button 
-          className="font-semibold bg-gradient-to-b from-gray-500 to-gray-900 hover:scale-105 transition-all duration-300 text-white p-2"
-          type="submit" onClick={createQuestion} disabled={loading}>
+          <Button
+            className="font-semibold bg-gradient-to-b from-gray-500 to-gray-900 hover:scale-105 transition-all duration-300 text-white p-2"
+            type="submit"
+            onClick={createQuestion}
+            disabled={loading}
+          >
             {loading ? <Spinner /> : "Create Question"}
           </Button>
           <DialogClose asChild>
@@ -607,17 +625,15 @@ const QuestionForm = ({
   link: string;
   fetchQues: () => void;
   setLoading: (x: boolean) => void;
-  setQuesText: (x:string)=>void;
-  setOp1: (x:string)=>void;
-  setOp2: (x:string)=>void;
-  setOp3: (x:string)=>void;
-  setOp4: (x:string)=>void;
-  setExplanation: (x:string)=>void;
-  setRefTitle: (x:string)=>void;
-  setLink: (x:string)=>void;
+  setQuesText: (x: string) => void;
+  setOp1: (x: string) => void;
+  setOp2: (x: string) => void;
+  setOp3: (x: string) => void;
+  setOp4: (x: string) => void;
+  setExplanation: (x: string) => void;
+  setRefTitle: (x: string) => void;
+  setLink: (x: string) => void;
 }) => {
-  
-  
   return (
     <div className="flex flex-col gap-2 w-full p-4 border">
       <div className="grid grid-cols-5 items-center gap-4">
@@ -688,7 +704,6 @@ const QuestionForm = ({
         </div>
       </div>
 
-
       <div className="grid grid-cols-5 items-center gap-4">
         <Label htmlFor="explanation" className="text-center">
           Explanation <span className="text-xs text-gray-500">Optional</span>
@@ -728,7 +743,6 @@ const QuestionForm = ({
           }}
         />
       </div>
-      
     </div>
   );
 };
@@ -761,17 +775,15 @@ const QuestionFormHindi = ({
   link: string;
   fetchQues: () => void;
   setLoading: (x: boolean) => void;
-  setQuesText: (x:string)=>void;
-  setOp1: (x:string)=>void;
-  setOp2: (x:string)=>void;
-  setOp3: (x:string)=>void;
-  setOp4: (x:string)=>void;
-  setExplanation: (x:string)=>void;
-  setRefTitle: (x:string)=>void;
-  setLink: (x:string)=>void;
+  setQuesText: (x: string) => void;
+  setOp1: (x: string) => void;
+  setOp2: (x: string) => void;
+  setOp3: (x: string) => void;
+  setOp4: (x: string) => void;
+  setExplanation: (x: string) => void;
+  setRefTitle: (x: string) => void;
+  setLink: (x: string) => void;
 }) => {
-  
-
   return (
     <div className="flex flex-col gap-2 w-full p-4 border">
       <div className="grid grid-cols-5 items-center gap-4">
@@ -881,11 +893,9 @@ const QuestionFormHindi = ({
           }}
         />
       </div>
-      
     </div>
   );
 };
-
 
 const UpdateQuestionDialog = ({
   question,
@@ -897,7 +907,7 @@ const UpdateQuestionDialog = ({
   const questionTagIds = question.tagId.map((tag) => tag._id);
   const [tags, setTags] = useState<TagType[]>([]);
   const [selectedTags, setSelectedTags] = useState<string[]>(questionTagIds);
-  console.log(questionTagIds)
+  console.log(questionTagIds);
 
   const [quesText, setQuesText] = useState(question.text);
   const [op1, setOp1] = useState(question.options[0].text);
@@ -917,8 +927,12 @@ const UpdateQuestionDialog = ({
   const [op3Hindi, setOp3Hindi] = useState(question.optionsHindi[2]?.text);
   const [op4Hindi, setOp4Hindi] = useState(question.optionsHindi[3]?.text);
 
-  const [explanationHindi, setExplanationHindi] = useState(question.explanationHindi);
-  const [refTitleHindi, setRefTitleHindi] = useState(question.referenceHindi?.title);
+  const [explanationHindi, setExplanationHindi] = useState(
+    question.explanationHindi
+  );
+  const [refTitleHindi, setRefTitleHindi] = useState(
+    question.referenceHindi?.title
+  );
   const [linkHindi, setLinkHindi] = useState(question.referenceHindi?.link);
 
   const { toast } = useToast();
@@ -929,6 +943,9 @@ const UpdateQuestionDialog = ({
       `${process.env.NEXT_PUBLIC_BASE_URL}/tag`,
       {
         withCredentials: true,
+        headers: {
+          'Authorization': 'Bearer ' + localStorage.getItem("token")
+        }
       }
     );
     const tags = response.data.tags;
@@ -1000,6 +1017,7 @@ const UpdateQuestionDialog = ({
         {
           headers: {
             "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
           },
           withCredentials: true,
         }
@@ -1036,57 +1054,61 @@ const UpdateQuestionDialog = ({
       <DialogContent className="sm:max-w-[90vw]">
         <DialogHeader>
           <DialogTitle>Edit Question</DialogTitle>
-          <DialogDescription>
-            <p className="text-red-500 font-medium underline">ENTER CORRECT OPTION AND TAGS AGAIN WHILE UPDATING</p>
+          <DialogDescription className="text-red-500 font-medium underline">
+              ENTER CORRECT OPTION AND TAGS AGAIN WHILE UPDATING
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-row gap-4 justify-evenly w-full">
           <div className="w-full">
-          <div className="font-semibold bg-gradient-to-b from-gray-400 to-gray-600 text-white p-2">English</div>
-          <QuestionForm 
-                quesText={quesText}
-                op1={op1}
-                op2={op2}
-                op3={op3}
-                op4={op4}
-                explanation={explanation as string}
-                refTitle={refTitle as string}
-                link={link as string}
-                setQuesText={setQuesText}
-                setOp1={setOp1}
-                setOp2={setOp2}
-                setOp3={setOp3}
-                setOp4={setOp4}
-                setExplanation={setExplanation}
-                setRefTitle={setRefTitle}
-                setLink={setLink}
-                fetchQues={fetchQues}
-                setLoading={setLoading}
-              />
+            <div className="font-semibold bg-gradient-to-b from-gray-400 to-gray-600 text-white p-2">
+              English
+            </div>
+            <QuestionForm
+              quesText={quesText}
+              op1={op1}
+              op2={op2}
+              op3={op3}
+              op4={op4}
+              explanation={explanation as string}
+              refTitle={refTitle as string}
+              link={link as string}
+              setQuesText={setQuesText}
+              setOp1={setOp1}
+              setOp2={setOp2}
+              setOp3={setOp3}
+              setOp4={setOp4}
+              setExplanation={setExplanation}
+              setRefTitle={setRefTitle}
+              setLink={setLink}
+              fetchQues={fetchQues}
+              setLoading={setLoading}
+            />
           </div>
 
           <div className="w-full">
-            <div className="font-semibold bg-gradient-to-b from-gray-400 to-gray-600 text-white p-2">Hindi</div>
+            <div className="font-semibold bg-gradient-to-b from-gray-400 to-gray-600 text-white p-2">
+              Hindi
+            </div>
             <QuestionFormHindi
-                quesText={quesTextHindi}
-                op1={op1Hindi}
-                op2={op2Hindi}
-                op3={op3Hindi}
-                op4={op4Hindi}
-                explanation={explanationHindi as string}
-                refTitle={refTitleHindi as string}
-                link={linkHindi as string}
-                setQuesText={setQuesTextHindi}
-                setOp1={setOp1Hindi}
-                setOp2={setOp2Hindi}
-                setOp3={setOp3Hindi}
-                setOp4={setOp4Hindi}
-                setExplanation={setExplanationHindi}
-                setRefTitle={setRefTitleHindi}
-                setLink={setLinkHindi}
-                fetchQues={fetchQues}
-                setLoading={setLoading}
-              />
+              quesText={quesTextHindi}
+              op1={op1Hindi}
+              op2={op2Hindi}
+              op3={op3Hindi}
+              op4={op4Hindi}
+              explanation={explanationHindi as string}
+              refTitle={refTitleHindi as string}
+              link={linkHindi as string}
+              setQuesText={setQuesTextHindi}
+              setOp1={setOp1Hindi}
+              setOp2={setOp2Hindi}
+              setOp3={setOp3Hindi}
+              setOp4={setOp4Hindi}
+              setExplanation={setExplanationHindi}
+              setRefTitle={setRefTitleHindi}
+              setLink={setLinkHindi}
+              fetchQues={fetchQues}
+              setLoading={setLoading}
+            />
           </div>
         </div>
 
@@ -1096,7 +1118,7 @@ const UpdateQuestionDialog = ({
             <Label htmlFor="correct" className="text-nowrap">
               Correct Option*
             </Label>
-            
+
             <ToggleGroup type="single" onValueChange={handleToggle}>
               <ToggleGroupItem value="1" aria-label="Toggle 1">
                 1
@@ -1145,12 +1167,14 @@ const UpdateQuestionDialog = ({
                             x
                           </div>
                         </div>
-                      )}});
-                    })}
-                  </div>
-                </div>
+                      );
+                    }
+                  });
+                })}
               </div>
+            </div>
           </div>
+        </div>
 
         <DialogFooter>
           <Button type="submit" onClick={updateQuestion} disabled={loading}>
@@ -1166,7 +1190,6 @@ const UpdateQuestionDialog = ({
     </Dialog>
   );
 };
-
 
 const ViewQuestionDialog = ({ question }: { question: QuestionType }) => {
   return (
@@ -1187,7 +1210,9 @@ const ViewQuestionDialog = ({ question }: { question: QuestionType }) => {
                 {index + 1}. {option.text}
               </div>
             ))}
-            <div className="font-semibold">Hindi: {question.textHindi || 'N/A'}</div>
+            <div className="font-semibold">
+              Hindi: {question.textHindi || "N/A"}
+            </div>
             {question.optionsHindi.map((option, index) => (
               <div key={index}>
                 {index + 1}. {option.text}

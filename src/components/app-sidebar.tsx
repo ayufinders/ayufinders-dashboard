@@ -33,6 +33,11 @@ const items = [
     icon: Book,
   },
   {
+    title: "PYQs",
+    url: "pyqs",
+    icon: Book,
+  },
+  {
     title: "Settings",
     url: "#",
     icon: Settings,

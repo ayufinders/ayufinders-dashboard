@@ -4,20 +4,20 @@ import { Button } from "@/components/ui/button";
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-const Syllabus = () => {
+const PreviousYearPapers = () => {
   const router = useRouter();
   const years = [
     {
       title: 1,
-      description: "View all subjects for year 1.",
+      description: "All question papers for year 1 subjects",
     },
     {
       title: 2,
-      description: "View all subjects for year 2.",
+      description: "All question papers for year 2 subjects.",
     },
     {
       title: 3,
-      description: "View all subjects for year 3.",
+      description: "All question papers for year 3 subjects.",
     },
   ];
 
@@ -25,7 +25,9 @@ const Syllabus = () => {
     <main className="p-6 sm:w-[90vw] md:w-[80vw] lg:min-w-[80vw] mx-auto">
       <div className="sticky top-0 z-50 bg-white p-4">
         <div className="flex flex-row justify-between items-center">
-          <p className="font-bold text-3xl text-gray-800">Syllabus</p>
+          <p className="font-bold text-3xl text-gray-800">
+            Previous Year Papers
+          </p>
         </div>
       </div>
 
@@ -46,7 +48,7 @@ const Syllabus = () => {
             <div>
               <Button
                 className="bg-gradient-to-b from-gray-600 to-gray-900 text-white hover:scale-105 transition-all duration-300"
-                onClick={() => router.push(`syllabus/subject/${year.title}`)}
+                onClick={() => router.push(`pyqs/subject/${year.title}`)}
               >
                 View <ChevronRight />
               </Button>
@@ -58,4 +60,4 @@ const Syllabus = () => {
   );
 };
 
-export default Syllabus;
+export default PreviousYearPapers;

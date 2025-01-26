@@ -1,40 +1,46 @@
-"use client"
-import { Button } from '@/components/ui/button'
-import { Book, Tags, Files } from 'lucide-react'
-import { useRouter } from 'next/navigation'
-import React from 'react'
+"use client";
+import { Button } from "@/components/ui/button";
+import { Book, Tags, Files } from "lucide-react";
+import { useRouter } from "next/navigation";
+import React from "react";
 
 const Dashboard = () => {
-
   const items = [
     {
       title: "Tags",
       icon: Tags,
-      path: '/tags'
+      path: "/tags",
     },
     {
       title: "Syllabus",
       icon: Book,
-      path: '/syllabus'
+      path: "/syllabus",
     },
     {
       title: "Quiz",
       icon: Files,
-      path: '/quiz'
-    }
-   
-  ]
+      path: "/quiz",
+    },
+    {
+      title: "PYQs",
+      icon: Files,
+      path: "/pyqs",
+    },
+  ];
 
-  const router = useRouter()
+  const router = useRouter();
   return (
-    <main className='p-4'>
-      <div className='font-bold text-2xl'>Dashboard</div>
-      <div className='flex flex-row gap-2 mt-4'>
-        {items.map(item => (
+    <main className="p-4">
+      <div className="font-bold text-2xl">Dashboard</div>
+      <div className="flex flex-row gap-2 mt-4">
+        {items.map((item) => (
           <div key={item.title}>
-            <Button onClick={()=>{router.push(`${item.path}`)}}
-              className='bg-gradient-to-b from-gray-500 to-gray-900 px-6 py-2 font-semibold cursor-pointer hover:scale-105 transition-all duration-300'
-              >
+            <Button
+              onClick={() => {
+                router.push(`${item.path}`);
+              }}
+              className="bg-gradient-to-b from-gray-500 to-gray-900 px-6 py-2 font-semibold cursor-pointer hover:scale-105 transition-all duration-300"
+            >
               {item.title}
               <item.icon></item.icon>
             </Button>
@@ -42,8 +48,7 @@ const Dashboard = () => {
         ))}
       </div>
     </main>
-    
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

@@ -1,29 +1,32 @@
-"use client"
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useRouter } from 'next/navigation';
-import { useUserContext } from '@/context';
+"use client";
+import React, { useState } from "react";
+import axios from "axios";
+import { useRouter } from "next/navigation";
+import { useUserContext } from "@/context";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
   const router = useRouter();
 
-  const {setUser} = useUserContext()
+  const { setUser } = useUserContext();
 
   const handleLogin = async (e: React.SyntheticEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
 
     try {
-      const response = await axios.post(`${process.env.NEXT_PUBLIC_BASE_URL}/admin/admin-signin`, 
-        { 
-          email, 
-          password 
-        }, {
-          withCredentials: true
-        });
+      const response = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/admin/admin-signin`,
+        {
+          email,
+          password,
+        },
+        {
+          withCredentials: true,
+        }
+      );
 
       if (response.status === 200) {
         const user = {
@@ -32,15 +35,16 @@ export default function LoginPage() {
           id: response.data.admin._id,
           loggedIn: true,
           access: response.data.admin.access,
-        }
-        setUser(user)
+        };
+        setUser(user);
         localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("token", response.data.token)
         // Redirect to the dashboard
-        router.push('/');
-      } 
+        router.push("/");
+      }
     } catch (err) {
-      console.log(err)
-      setError("Invalid email or password")
+      console.log(err);
+      setError("Invalid email or password");
     }
   };
 
@@ -48,7 +52,9 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <div className="w-full max-w-md p-8 space-y-4 bg-white rounded-2xl shadow-md">
         <h1 className="text-3xl font-bold text-center">Ayufinders</h1>
-        <h2 className="text-2xl font-bold text-center text-gray-700">Login to Dashboard</h2>
+        <h2 className="text-2xl font-bold text-center text-gray-700">
+          Login to Dashboard
+        </h2>
 
         {error && (
           <div className="p-2 text-red-600 bg-red-100 border border-red-400 rounded">
@@ -58,7 +64,10 @@ export default function LoginPage() {
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-700"
+            >
               Email
             </label>
             <input
@@ -72,7 +81,10 @@ export default function LoginPage() {
           </div>
 
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+            <label
+              htmlFor="password"
+              className="block text-sm font-medium text-gray-700"
+            >
               Password
             </label>
             <input

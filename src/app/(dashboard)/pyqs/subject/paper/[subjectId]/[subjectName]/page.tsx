@@ -21,11 +21,12 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useRouter, useParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import Spinner from "@/components/Spinner";
-import { ChevronRight, Trash } from "lucide-react";
+import { SquareArrowOutUpRightIcon, Trash } from "lucide-react";
 import { useUserContext } from "@/context";
+import { Label } from "@/components/ui/label";
 
 const Papers = () => {
   const [papers, setPapers] = useState<PaperType[]>([]);
@@ -39,7 +40,7 @@ const Papers = () => {
   const fetchPapers = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/paper/${subjectId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/questionPaper/${subjectId}`,
         {
           withCredentials: true,
           headers: {
@@ -103,6 +104,14 @@ type PaperType = {
   description: string;
   createdAt: string;
   updatedAt: string;
+  createdBy: Admin;
+  url: string;
+  year: string;
+  key: string
+};
+
+type Admin = {
+  name: string;
 };
 
 const PaperList = ({
@@ -112,15 +121,15 @@ const PaperList = ({
   papers: PaperType[];
   fetchTopics: () => void;
 }) => {
-  const router = useRouter();
-
   return (
     <Table className="w-full">
       <TableHeader className="bg-gray-50">
         <TableRow>
           <TableHead className="w-[100px]">S. No.</TableHead>
+          <TableHead>Year</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Description</TableHead>
+          <TableHead>Added By</TableHead>
           <TableHead></TableHead>
         </TableRow>
       </TableHeader>
@@ -128,25 +137,19 @@ const PaperList = ({
         {papers.map((sub: PaperType, index: number) => (
           <TableRow key={index} className="cursor-pointer hover:bg-gray-50">
             <TableCell className="font-medium">{index + 1}</TableCell>
+            <TableCell className="font-semibold">{sub.year}</TableCell>
             <TableCell className="font-semibold">{sub.name}</TableCell>
             <TableCell>{sub.description}</TableCell>
-            <TableCell className="flex gap-2">
-              <Button
-                onClick={() => {
-                  router.push(
-                    `/syllabus/subject/paper/subjectTopic/${sub._id}/${sub.name}`
-                  );
-                }}
-                className="bg-gradient-to-b from-gray-600 to-gray-900 rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 duration-300 transition-all"
-              >
-                View <ChevronRight />
-              </Button>
-              <EditPaper fetchTopics={fetchTopics} paper={sub} />
+            <TableCell>{sub.createdBy?.name}</TableCell>
+            <TableCell className="flex gap-4 items-center">
               <DeleteModalButton
                 paperId={sub._id}
                 paperName={sub.name}
                 fetchTopics={fetchTopics}
               />
+              <a href={sub.url} target="_blank">
+                <SquareArrowOutUpRightIcon className="h-8 w-8 text-gray-500 font-thin" />
+              </a>
             </TableCell>
           </TableRow>
         ))}
@@ -164,18 +167,106 @@ const AddPaper = ({
 }) => {
   const [paperName, setPaperName] = useState("");
   const [paperDesc, setPaperDesc] = useState("");
+  const [fileData, setFileData] = useState<FileUpload | null>(null);
+  const [thumbnailData, setThumbnailData] = useState<FileUpload | null>(null);
+  const [year, setYear] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFileData({
+        fileName: file.name,
+        fileType: file.type,
+        fileDesc: paperDesc,
+        file,
+      });
+    }
+  };
+
+  const handleThumbnailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setThumbnailData({
+        fileName: file.name,
+        fileType: file.type,
+        fileDesc: paperDesc,
+        file,
+      });
+    }
+  };
+
+  const { user } = useUserContext();
+
   const addPaperHandler = async () => {
+    if (!fileData || !paperDesc || !paperName)
+      return alert("File and document details are required");
+
     try {
       setLoading(true);
+
+      const docRes = await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/aws/generate-presigned-url`,
+        {
+          fileName: fileData.fileName,
+          fileType: fileData.fileType,
+        },
+        {
+          headers: { 
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          },
+          withCredentials: true,
+        }
+      );
+
+      const { url: docUrl, key: docKey } = docRes.data;
+
+      // Upload the file to S3
+      await axios.put(docUrl, fileData.file, {
+        headers: { "Content-Type": fileData.fileType },
+      });
+
+      // Upload the thumbnail if provided
+      let thumbnailKey = null;
+      if (thumbnailData) {
+        const thumbRes = await axios.post(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/aws/generate-presigned-url`,
+          {
+            fileName: thumbnailData.fileName,
+            fileType: thumbnailData.fileType,
+          },
+          {
+            headers: { 
+              "Content-Type": "application/json",
+              'Authorization': 'Bearer ' + localStorage.getItem("token")
+            },
+            withCredentials: true,
+          }
+        );
+
+        const { url: thumbUrl, key: thumbKey } = thumbRes.data;
+
+        // Upload the thumbnail to S3
+        await axios.put(thumbUrl, thumbnailData.file, {
+          headers: { "Content-Type": thumbnailData.fileType },
+        });
+
+        thumbnailKey = thumbKey;
+      }
+
+      // save the urls to database
       const response = await axios.post(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/paper`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/questionPaper/${subjectId}`,
         {
           name: paperName,
           description: paperDesc,
           subjectId: subjectId,
+          createdBy: user.id,
+          key: docKey,
+          thumbnailKey,
+          year: year,
         },
         {
           headers: {
@@ -204,6 +295,9 @@ const AddPaper = ({
     } finally {
       setPaperName("");
       setPaperDesc("");
+      setYear("");
+      setFileData(null);
+      setThumbnailData(null);
       setLoading(false);
     }
   };
@@ -225,6 +319,7 @@ const AddPaper = ({
             }}
             type="text"
             placeholder="Paper Name"
+            required
           />
           <Textarea
             value={paperDesc}
@@ -233,7 +328,25 @@ const AddPaper = ({
             }}
             rows={2}
             placeholder="Paper Description (optional)"
+            required
           />
+
+          <Label className="mt-2">Select year</Label>
+          <Input
+            value={year}
+            onChange={(e) => {
+              setYear(e.target.value);
+            }}
+            type="text"
+            placeholder="2023"
+            required={true}
+          />
+
+          <Label className="mt-2">Thumbnail Image</Label>
+          <Input type="file" onChange={handleThumbnailChange} />
+
+          <Label className="mt-2">Question Paper Pdf</Label>
+          <Input type="file" onChange={handleFileChange} />
         </div>
         <DialogFooter>
           <Button
@@ -243,104 +356,6 @@ const AddPaper = ({
             disabled={loading}
           >
             {loading ? <Spinner /> : "Add Paper"}
-          </Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
-  );
-};
-
-const EditPaper = ({
-  fetchTopics,
-  paper,
-}: {
-  fetchTopics: () => void;
-  paper: PaperType;
-}) => {
-  const [paperName, setPaperName] = useState(paper.name);
-  const [paperDesc, setPaperDesc] = useState(paper.description);
-  const { toast } = useToast();
-  const [loading, setLoading] = useState(false);
-
-  const params = useParams();
-  const subjectId = params.subjectId;
-
-  const updatePaperHandler = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/paper/${paper._id}`,
-        {
-          name: paperName,
-          description: paperDesc,
-          subjectId: subjectId,
-        },
-        {
-          headers: {
-            "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          },
-          withCredentials: true,
-        }
-      );
-
-      if (!response.data.success) {
-        toast({
-          title: "Paper not updated.",
-          description: `${paperName} does not exist.`,
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Paper updated.",
-          description: `${paperDesc} has been successfully updated.`,
-        });
-        fetchTopics();
-      }
-    } catch (error) {
-      console.log(error);
-    } finally {
-      setPaperName("");
-      setPaperDesc("");
-      setLoading(false);
-    }
-  };
-
-  return (
-    <Dialog>
-      <DialogTrigger className="flex flex-row gap-2 items-center bg-gradient-to-b from-gray-600 to-gray-900 text-white font-medium rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 duration-300 transition-all">
-        <span>Edit</span>
-        <ChevronRight size={16} />
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Edit the Paper Details</DialogTitle>
-        </DialogHeader>
-        <div className="flex flex-col gap-2">
-          <Input
-            value={paperName}
-            onChange={(e) => {
-              setPaperName(e.target.value);
-            }}
-            type="text"
-            placeholder="Paper Name"
-          />
-          <Textarea
-            value={paperDesc}
-            onChange={(e) => {
-              setPaperDesc(e.target.value);
-            }}
-            rows={2}
-            placeholder="Paper Description (optional)"
-          />
-        </div>
-        <DialogFooter>
-          <Button
-            type="submit"
-            onClick={updatePaperHandler}
-            className="bg-gradient-to-b from-gray-600 to-gray-800 font-semibold text-white rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 duration-300 transition-all"
-          >
-            {loading ? <Spinner /> : "Update"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -361,11 +376,15 @@ const DeleteModalButton = ({
   const [loading, setLoading] = useState(false);
   const { user } = useUserContext();
 
+  const params = useParams();
+  const subjectId = params.subjectId;
+
   const deletePaperHandler = async (paperId: string, paperName: string) => {
     try {
       setLoading(true);
+
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/paper/${paperId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/questionPaper/${subjectId}/${paperId}`,
         {
           withCredentials: true,
           headers: {
@@ -377,11 +396,11 @@ const DeleteModalButton = ({
         title: "Paper deleted.",
         description: `${paperName} has been successfully deleted.`,
       });
-      fetchTopics();
     } catch (error) {
       console.error(error);
     } finally {
       setLoading(false);
+      fetchTopics();
     }
   };
 
@@ -416,5 +435,12 @@ const DeleteModalButton = ({
     </Dialog>
   );
 };
+
+interface FileUpload {
+  fileName: string;
+  fileDesc: string;
+  fileType: string;
+  file: File;
+}
 
 export default Papers;
