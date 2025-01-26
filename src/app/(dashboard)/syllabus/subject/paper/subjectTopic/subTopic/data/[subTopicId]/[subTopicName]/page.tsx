@@ -689,7 +689,7 @@ const DeleteVideoModalButton = ({
         }
       );
       await axios.delete(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/subTopic/video/${subTopicId}/${videoId}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/subTopic/video/delete/${subTopicId}/${videoId}`,
         {
           withCredentials: true,
           headers: {
