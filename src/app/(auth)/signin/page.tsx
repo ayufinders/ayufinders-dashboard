@@ -40,7 +40,7 @@ export default function LoginPage() {
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", response.data.token)
         // Redirect to the dashboard
-        router.push("/");
+        router.replace("/");
       }
     } catch (err) {
       console.log(err);

@@ -35,6 +35,7 @@ import { useUserContext } from "@/context";
 import { Copy, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger } from "@/components/ui/select";
 
 const SubTopicData = () => {
   const [mcqQuestions, setMcqQuestions] = useState<QuestionType[]>([]);
@@ -189,6 +190,7 @@ const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
   const [videoDesc, setVideoDesc] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [lang, setLang] = useState<string>("eng")
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -292,6 +294,7 @@ const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
           createdBy: user.id,
           thumbnailKey: thumbnailKey,
           key: key,
+          language: lang
         },
         {
           headers: {
@@ -344,7 +347,19 @@ const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
           <Input type="file" onChange={handleFileChange}></Input>
           <Label>Thumbnail Image</Label>
           <Input type="file" onChange={handleThumbnailChange}></Input>
+
+          <Label>Language</Label>
+          <Select onValueChange={setLang} value={lang}>
+            <SelectGroup>
+              <SelectTrigger>{lang=="eng" ? "English" : "Hindi"}</SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hi">English</SelectItem>
+                <SelectItem value="eng">Hindi</SelectItem>
+              </SelectContent>
+            </SelectGroup>
+          </Select>
         </div>
+
         <DialogFooter>
           <Button
             type="submit"
@@ -430,6 +445,7 @@ const UploadDocFile = ({ fetchData }: { fetchData: () => void }) => {
   const [docDesc, setDocDesc] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const [lang, setLang] = useState("eng")
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -531,6 +547,7 @@ const UploadDocFile = ({ fetchData }: { fetchData: () => void }) => {
           key: key,
           thumbnailKey: thumbnailKey,
           subTopicId: subTopicId,
+          language: lang
         },
         {
           headers: {
@@ -583,6 +600,17 @@ const UploadDocFile = ({ fetchData }: { fetchData: () => void }) => {
           <Input type="file" onChange={handleFileChange}></Input>
           <Label>Thumbnail Image</Label>
           <Input type="file" onChange={handleThumbnailChange} />
+
+          <Label>Language</Label>
+          <Select onValueChange={setLang} value={lang}>
+            <SelectGroup>
+              <SelectTrigger value={lang}>Choose language</SelectTrigger>
+              <SelectContent>
+                <SelectItem value="hi">English</SelectItem>
+                <SelectItem value="eng">Hindi</SelectItem>
+              </SelectContent>
+            </SelectGroup>
+          </Select>
         </div>
         <DialogFooter>
           <Button

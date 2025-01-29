@@ -27,6 +27,7 @@ import Spinner from "@/components/Spinner";
 import { SquareArrowOutUpRightIcon, Trash } from "lucide-react";
 import { useUserContext } from "@/context";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const Papers = () => {
   const [papers, setPapers] = useState<PaperType[]>([]);
@@ -58,7 +59,8 @@ const Papers = () => {
 
   useEffect(() => {
     const filteredPapers = papers.filter((topic) =>
-      topic.name.toLowerCase().includes(search)
+      topic.name.toLowerCase().includes(search.toLowerCase()) 
+      || topic.university.name.toLowerCase().includes(search.toLowerCase())
     );
     setFilteredPapers(filteredPapers);
   }, [search, papers]);
@@ -80,9 +82,10 @@ const Papers = () => {
                   setSearch(e.target.value);
                 }}
                 className="p-2 w-full"
-                placeholder="Search for topics..."
+                placeholder="Search"
               />
             </div>
+            
             <AddPaper
               fetchTopics={fetchPapers}
               subjectId={subjectId as string}
@@ -107,7 +110,8 @@ type PaperType = {
   createdBy: Admin;
   url: string;
   year: string;
-  key: string
+  key: string;
+  university: UniversityType
 };
 
 type Admin = {
@@ -129,6 +133,7 @@ const PaperList = ({
           <TableHead>Year</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Description</TableHead>
+          <TableHead>University</TableHead>
           <TableHead>Added By</TableHead>
           <TableHead></TableHead>
         </TableRow>
@@ -140,6 +145,7 @@ const PaperList = ({
             <TableCell className="font-semibold">{sub.year}</TableCell>
             <TableCell className="font-semibold">{sub.name}</TableCell>
             <TableCell>{sub.description}</TableCell>
+            <TableCell>{sub.university.name}</TableCell>
             <TableCell>{sub.createdBy?.name}</TableCell>
             <TableCell className="flex gap-4 items-center">
               <DeleteModalButton
@@ -170,6 +176,7 @@ const AddPaper = ({
   const [fileData, setFileData] = useState<FileUpload | null>(null);
   const [thumbnailData, setThumbnailData] = useState<FileUpload | null>(null);
   const [year, setYear] = useState("");
+  const [uniId, setUniId] = useState<string>()
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -196,6 +203,7 @@ const AddPaper = ({
       });
     }
   };
+
 
   const { user } = useUserContext();
 
@@ -267,6 +275,7 @@ const AddPaper = ({
           key: docKey,
           thumbnailKey,
           year: year,
+          university: uniId
         },
         {
           headers: {
@@ -296,11 +305,31 @@ const AddPaper = ({
       setPaperName("");
       setPaperDesc("");
       setYear("");
+      setUniId("")
       setFileData(null);
       setThumbnailData(null);
       setLoading(false);
     }
   };
+
+  const [unis, setUnis] = useState<UniversityType[]>([])
+
+  const fetchUnis = async () => {
+    try{
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/universities`, {
+        withCredentials: true,
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+      })
+      const universities = response.data.universities
+      setUnis(universities)
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
+
 
   return (
     <Dialog>
@@ -331,14 +360,26 @@ const AddPaper = ({
             required
           />
 
-          <Label className="mt-2">Select year</Label>
+          <Label className="mt-4">College</Label>
+          <Select onValueChange={setUniId}>
+            <SelectTrigger className="w-full" onClick={fetchUnis}>
+              <SelectValue placeholder="Select an option" />
+            </SelectTrigger>
+            <SelectContent>
+              {unis.map((uni: UniversityType)=>{
+                return <SelectItem key={uni._id} value={uni._id}>{uni.name}</SelectItem>
+              })}
+            </SelectContent>
+          </Select>
+
+          <Label className="mt-2">Year</Label>
           <Input
             value={year}
             onChange={(e) => {
               setYear(e.target.value);
             }}
             type="text"
-            placeholder="2023"
+            placeholder="20XX"
             required={true}
           />
 
@@ -442,5 +483,13 @@ interface FileUpload {
   fileType: string;
   file: File;
 }
+
+type UniversityType = {
+  _id: string;
+  name: string;
+  description: string;
+  createdBy: Admin;
+};
+
 
 export default Papers;

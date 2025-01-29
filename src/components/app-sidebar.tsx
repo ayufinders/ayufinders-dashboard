@@ -1,5 +1,5 @@
 "use client"
-import { Tags, Files, Settings, Book } from "lucide-react"
+import { Tags, Files, Settings, Book, University } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -36,6 +36,11 @@ const items = [
     title: "PYQs",
     url: "pyqs",
     icon: Book,
+  },
+  {
+    title: "Universities",
+    url: "university",
+    icon: University,
   },
   {
     title: "Settings",

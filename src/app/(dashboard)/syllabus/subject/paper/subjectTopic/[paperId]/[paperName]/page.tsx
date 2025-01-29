@@ -353,7 +353,7 @@ const AddSubjectTopic = ({
             rows={2}
             placeholder="Subject Description (optional)"
           ></Textarea>
-          <Label className="mt-4">Select Type</Label>
+          <Label className="mt-4">Select Year</Label>
           <ToggleGroup
             type="single"
             value={year}

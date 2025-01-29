@@ -34,7 +34,7 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ChevronRight, Trash } from "lucide-react";
+import { ChevronRight, RefreshCwIcon, Trash } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
 
@@ -257,6 +257,7 @@ const TagsMenu = ({
   selectedTags: string[];
   setSelectedTags: (tags: string[]) => void;
 }) => {
+
   const addTag = (id: string) => {
     if (!selectedTags.includes(id) && !questionTags.includes(id)) {
       setSelectedTags([...selectedTags, id]);
@@ -541,7 +542,9 @@ const CreateQuestionDialog = ({
             <Label htmlFor="tags" className="text-center grid-cols-1">
               Tags
             </Label>
-
+            <Button variant={"outline"} onClick={fetchTags}>
+              <RefreshCwIcon />
+            </Button>
             <div className="w-full flex flex-row gap-2 items-center">
               <TagsMenu
                 tags={tags}
