@@ -35,7 +35,7 @@ import { useUserContext } from "@/context";
 import { Copy, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger } from "@/components/ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 const SubTopicData = () => {
   const [mcqQuestions, setMcqQuestions] = useState<QuestionType[]>([]);
@@ -351,7 +351,9 @@ const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
           <Label>Language</Label>
           <Select onValueChange={setLang} value={lang}>
             <SelectGroup>
-              <SelectTrigger>{lang=="eng" ? "English" : "Hindi"}</SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Select language" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="hi">English</SelectItem>
                 <SelectItem value="eng">Hindi</SelectItem>
@@ -604,7 +606,9 @@ const UploadDocFile = ({ fetchData }: { fetchData: () => void }) => {
           <Label>Language</Label>
           <Select onValueChange={setLang} value={lang}>
             <SelectGroup>
-              <SelectTrigger value={lang}>Choose language</SelectTrigger>
+              <SelectTrigger>
+                <SelectValue placeholder="Select Language" />
+              </SelectTrigger>
               <SelectContent>
                 <SelectItem value="hi">English</SelectItem>
                 <SelectItem value="eng">Hindi</SelectItem>

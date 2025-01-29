@@ -371,6 +371,8 @@ const DeleteModalButton = ({
     } catch (error) {
       console.error(error);
       setLoading(false);
+    } finally {
+      setLoading(false)
     }
   };
 
