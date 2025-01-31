@@ -435,7 +435,7 @@ const EditPaper = ({
   const [desc, setDesc] = useState(paper.description);
   const [month, setMonth] = useState(paper.month);
   const [year, setYear] = useState(paper.year);
-  const [uniId, setUniId] = useState<UniversityType|null>(paper.university);
+  const [uniId, setUniId] = useState(paper.university?._id);
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -493,7 +493,7 @@ const EditPaper = ({
       setDesc("");
       setYear("");
       setMonth("");
-      setUniId(null);
+      setUniId("");
       setLoading(false);
     }
   };
