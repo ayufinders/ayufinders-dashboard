@@ -131,6 +131,7 @@ const PaperList = ({
       <TableHeader className="bg-gray-50">
         <TableRow>
           <TableHead className="w-[100px]">S. No.</TableHead>
+          <TableHead>Month</TableHead>
           <TableHead>Year</TableHead>
           <TableHead>Name</TableHead>
           <TableHead>Description</TableHead>
@@ -143,9 +144,10 @@ const PaperList = ({
         {papers.map((sub: PaperType, index: number) => (
           <TableRow key={index} className="cursor-pointer hover:bg-gray-50">
             <TableCell className="font-medium">{index + 1}</TableCell>
-            <TableCell className="font-semibold">{sub.year}</TableCell>
+            <TableCell className="font-medium">{sub.month}</TableCell>
+            <TableCell className="font-medium">{sub.year}</TableCell>
             <TableCell className="font-semibold">{sub.name}</TableCell>
-            <TableCell>{sub.description}</TableCell>
+            <TableCell>{sub.description? "Added":"Not Added"}</TableCell>
             <TableCell>{sub.university.name}</TableCell>
             <TableCell>{sub.createdBy?.name}</TableCell>
             <TableCell className="flex gap-4 items-center">
@@ -159,7 +161,7 @@ const PaperList = ({
                 fetchTopics={fetchTopics}
               />
               <a href={sub.url} target="_blank">
-                <SquareArrowOutUpRightIcon className="h-8 w-8 text-gray-500 font-thin" />
+                <SquareArrowOutUpRightIcon className="h-6 w-6 text-gray-500 font-thin" />
               </a>
             </TableCell>
           </TableRow>
@@ -433,7 +435,7 @@ const EditPaper = ({
   const [desc, setDesc] = useState(paper.description);
   const [month, setMonth] = useState(paper.month);
   const [year, setYear] = useState(paper.year);
-  const [uniId, setUniId] = useState(paper.university);
+  const [uniId, setUniId] = useState<UniversityType|null>(paper.university);
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
@@ -491,7 +493,7 @@ const EditPaper = ({
       setDesc("");
       setYear("");
       setMonth("");
-      setUniId("");
+      setUniId(null);
       setLoading(false);
     }
   };
