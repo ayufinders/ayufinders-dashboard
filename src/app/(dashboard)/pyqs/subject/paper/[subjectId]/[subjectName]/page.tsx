@@ -110,6 +110,7 @@ type PaperType = {
   createdBy: Admin;
   url: string;
   year: string;
+  month: string;
   key: string;
   university: UniversityType
 };
@@ -428,11 +429,11 @@ const EditPaper = ({
   fetchData: () => void;
   paper: PaperType;
 }) => {
-  const [name, setName] = useState("");
-  const [desc, setDesc] = useState("");
-  const [month, setMonth] = useState("");
-  const [year, setYear] = useState("");
-  const [uniId, setUniId] = useState("");
+  const [name, setName] = useState(paper.name);
+  const [desc, setDesc] = useState(paper.description);
+  const [month, setMonth] = useState(paper.month);
+  const [year, setYear] = useState(paper.year);
+  const [uniId, setUniId] = useState(paper.university);
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
