@@ -24,7 +24,7 @@ import { useToast } from "@/hooks/use-toast";
 import { useParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import Spinner from "@/components/Spinner";
-import { SquareArrowOutUpRightIcon, Trash } from "lucide-react";
+import { ChevronRight, SquareArrowOutUpRightIcon, Trash } from "lucide-react";
 import { useUserContext } from "@/context";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -148,6 +148,10 @@ const PaperList = ({
             <TableCell>{sub.university.name}</TableCell>
             <TableCell>{sub.createdBy?.name}</TableCell>
             <TableCell className="flex gap-4 items-center">
+              <EditPaper
+                paper={sub}
+                fetchData={fetchTopics}
+              />
               <DeleteModalButton
                 paperId={sub._id}
                 paperName={sub.name}
@@ -176,6 +180,7 @@ const AddPaper = ({
   const [fileData, setFileData] = useState<FileUpload | null>(null);
   const [thumbnailData, setThumbnailData] = useState<FileUpload | null>(null);
   const [year, setYear] = useState("");
+  const [month, setMonth] = useState("");
   const [uniId, setUniId] = useState<string>()
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -208,7 +213,7 @@ const AddPaper = ({
   const { user } = useUserContext();
 
   const addPaperHandler = async () => {
-    if (!fileData || !paperDesc || !paperName)
+    if (!fileData || !paperName)
       return alert("File and document details are required");
 
     try {
@@ -275,6 +280,7 @@ const AddPaper = ({
           key: docKey,
           thumbnailKey,
           year: year,
+          month: month,
           university: uniId
         },
         {
@@ -305,7 +311,8 @@ const AddPaper = ({
       setPaperName("");
       setPaperDesc("");
       setYear("");
-      setUniId("")
+      setMonth("");
+      setUniId("");
       setFileData(null);
       setThumbnailData(null);
       setLoading(false);
@@ -372,6 +379,16 @@ const AddPaper = ({
             </SelectContent>
           </Select>
 
+          <Label className="mt-2">Month</Label>
+          <Input
+            value={month}
+            onChange={(e) => {
+              setMonth(e.target.value);
+            }}
+            type="text"
+            placeholder="Month"
+          />
+
           <Label className="mt-2">Year</Label>
           <Input
             value={year}
@@ -397,6 +414,158 @@ const AddPaper = ({
             disabled={loading}
           >
             {loading ? <Spinner /> : "Add Paper"}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+const EditPaper = ({
+  fetchData,
+  paper,
+}: {
+  fetchData: () => void;
+  paper: PaperType;
+}) => {
+  const [name, setName] = useState("");
+  const [desc, setDesc] = useState("");
+  const [month, setMonth] = useState("");
+  const [year, setYear] = useState("");
+  const [uniId, setUniId] = useState("");
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(false);
+
+  const [unis, setUnis] = useState<UniversityType[]>([])
+
+  const fetchUnis = async () => {
+    try{
+      const response = await axios.get(`${process.env.NEXT_PUBLIC_BASE_URL}/universities`, {
+        withCredentials: true,
+        headers: {
+          "Authorization": "Bearer " + localStorage.getItem("token")
+        }
+      })
+      const universities = response.data.universities
+      setUnis(universities)
+    }
+    catch(error){
+      console.log(error)
+    }
+  }
+
+  const editTopicHandler = async () => {
+    try {
+      setLoading(true);
+      const response = await axios.put(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/questionPaper/${paper._id}`,
+        {
+          name: name,
+          description: desc,
+          month: month,
+          year: year,
+          university: uniId
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          },
+          withCredentials: true,
+        }
+      );
+
+      toast({
+        title: response.data.success ? "Paper updated" : "Paper not updated",
+        description: response.data.success
+          ? `${name} successfully updated.`
+          : `${name} does not exist.`,
+        variant: response.data.success ? "default" : "destructive",
+      });
+      fetchData();
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setName("");
+      setDesc("");
+      setYear("");
+      setMonth("");
+      setUniId("");
+      setLoading(false);
+    }
+  };
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>
+        <Button className="bg-gradient-to-b from-gray-500 to-gray-800 px-4 py-1 hover:scale-105 transition-all duration-300">
+          Edit <ChevronRight size={20} />
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle className="my-2 text-gray-700">Edit Paper</DialogTitle>
+        </DialogHeader>
+        <div className="flex flex-col gap-2">
+        <Input
+            value={name}
+            onChange={(e) => {
+              setName(e.target.value);
+            }}
+            type="text"
+            placeholder="Paper Name"
+            required
+          />
+          <Textarea
+            value={desc}
+            onChange={(e) => {
+              setDesc(e.target.value);
+            }}
+            rows={2}
+            placeholder="Paper Description (optional)"
+            required
+          />
+
+          <Label className="mt-4">College</Label>
+          <Select onValueChange={setUniId}>
+            <SelectTrigger className="w-full" onClick={fetchUnis}>
+              <SelectValue placeholder="Select an option" />
+            </SelectTrigger>
+            <SelectContent>
+              {unis.map((uni: UniversityType)=>{
+                return <SelectItem key={uni._id} value={uni._id}>{uni.name}</SelectItem>
+              })}
+            </SelectContent>
+          </Select>
+
+          <Label className="mt-2">Month</Label>
+          <Input
+            value={month}
+            onChange={(e) => {
+              setMonth(e.target.value);
+            }}
+            type="text"
+            placeholder="Month"
+          />
+
+          <Label className="mt-2">Year</Label>
+          <Input
+            value={year}
+            onChange={(e) => {
+              setYear(e.target.value);
+            }}
+            type="text"
+            placeholder="20XX"
+            required={true}
+          />
+        </div>
+        <DialogFooter>
+          <Button
+            className="bg-gradient-to-b from-gray-600 to-gray-900 text-white hover:scale-105 font-semibold transition-all duration-300"
+            onClick={editTopicHandler}
+            disabled={loading}
+          >
+            {loading ? <Spinner /> : "Edit Topic"}
           </Button>
         </DialogFooter>
       </DialogContent>
