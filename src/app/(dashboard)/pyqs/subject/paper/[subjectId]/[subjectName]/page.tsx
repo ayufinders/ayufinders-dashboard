@@ -382,15 +382,17 @@ const AddPaper = ({
             </SelectContent>
           </Select>
 
-          <Label className="mt-2">Month</Label>
-          <Input
-            value={month}
-            onChange={(e) => {
-              setMonth(e.target.value);
-            }}
-            type="text"
-            placeholder="Month"
-          />
+          <Label className="mt-4">Month</Label>
+          <Select onValueChange={setMonth}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select month" />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((month: string)=>{
+                return <SelectItem key={month} value={month}>{month}</SelectItem>
+              })}
+            </SelectContent>
+          </Select>
 
           <Label className="mt-2">Year</Label>
           <Input
@@ -541,15 +543,17 @@ const EditPaper = ({
             </SelectContent>
           </Select>
 
-          <Label className="mt-2">Month</Label>
-          <Input
-            value={month}
-            onChange={(e) => {
-              setMonth(e.target.value);
-            }}
-            type="text"
-            placeholder="Month"
-          />
+          <Label className="mt-4">Month</Label>
+          <Select onValueChange={setMonth}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Select month" />
+            </SelectTrigger>
+            <SelectContent>
+              {months.map((month: string)=>{
+                return <SelectItem key={month} value={month}>{month}</SelectItem>
+              })}
+            </SelectContent>
+          </Select>
 
           <Label className="mt-2">Year</Label>
           <Input
@@ -663,5 +667,19 @@ type UniversityType = {
   createdBy: Admin;
 };
 
+const months = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December'
+]
 
 export default Papers;
