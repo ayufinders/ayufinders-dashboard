@@ -269,7 +269,7 @@ const TagsMenu = ({
       <DropdownMenuTrigger className="border p-2 px-4 w-[100px] rounded-md text-sm">
         Select
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-[300px]">
+      <DropdownMenuContent className="overflow-y-scroll max-h-[800px]">
         <DropdownMenuLabel>Tags</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {tags.map((item) => {
