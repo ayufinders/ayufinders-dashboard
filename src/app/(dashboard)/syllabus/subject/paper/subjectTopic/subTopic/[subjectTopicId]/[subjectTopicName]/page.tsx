@@ -304,7 +304,7 @@ const AddSubTopic = ({
           </ToggleGroup>
 
           <div className="flex flex-row gap-4 mt-4">
-            <div className="max-w-60 overflow-y-scroll">
+            <div>
               <TagsMenu
                 selectedTags={selectedTags}
                 tags={tags}
@@ -312,14 +312,22 @@ const AddSubTopic = ({
               />
             </div>
             
-            <div className="w-80 overflow-x-scroll p-1 border flex-row flex gap-1">
+            <div className="w-80 flex-wrap max-h-52 overflow-x-scroll p-1 border flex-row flex gap-1">
               {selectedTags.map((tag) => {
                 return (
                   <div
                     key={tag._id}
-                    className="bg-gray-100 py-1 px-2 rounded-md text-nowrap"
+                    className="bg-gray-100 h-fit py-1 px-2 rounded-md text-nowrap"
                   >
                     {tag.name}
+                    <button className="text-red-600 ml-2 cursor-pointer"
+                    onClick={()=>{
+                      const tagsArray = selectedTags.filter((t: TagType) => t._id != tag._id)
+                      setSelectedTags(tagsArray)
+                    }}
+                    >
+                      x
+                    </button>
                   </div>
                 );
               })}
@@ -398,7 +406,7 @@ const UpdateSubTopicDialog = ({
   };
 
   const [tags, setTags] = useState<TagType[]>([]);
-  const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
+  const [selectedTags, setSelectedTags] = useState<TagType[]>(subTopic.tagId);
 
   useEffect(() => {
     async function fetchTags() {
@@ -417,6 +425,7 @@ const UpdateSubTopicDialog = ({
 
     fetchTags();
   }, []);
+
 
   return (
     <Dialog>
@@ -445,20 +454,31 @@ const UpdateSubTopicDialog = ({
             rows={2}
             placeholder="Sub Topic Description (optional)"
           ></Textarea>
-          <div className="overflow-y-scroll flex flex-row gap-4">
-            <TagsMenu
-              selectedTags={selectedTags}
-              tags={tags}
-              setSelectedTags={setSelectedTags}
-            />
-            <div className="w-80 overflow-x-scroll p-1 border flex-row flex gap-1">
+          <div className="flex flex-row gap-4">
+            <div>
+              <TagsMenu
+                selectedTags={selectedTags}
+                tags={tags}
+                setSelectedTags={setSelectedTags}
+              />
+            </div>
+            
+            <div className="w-80 max-h-52 flex-wrap overflow-scroll p-1 border flex-row flex gap-1">
               {selectedTags.map((tag) => {
                 return (
                   <div
                     key={tag._id}
-                    className="bg-gray-100 py-1 px-2 rounded-md text-nowrap"
+                    className="bg-gray-100 text-sm py-1 px-2 rounded text-nowrap"
                   >
                     {tag.name}
+                    <button className="ml-2 text-red-600"
+                    onClick={()=>{
+                      const tagsArray = selectedTags.filter((t: TagType) => t._id !== tag._id)
+                      setSelectedTags(tagsArray)
+                    }}
+                    >
+                      x
+                    </button>
                   </div>
                 );
               })}
@@ -571,7 +591,7 @@ const TagsMenu = ({
       <DropdownMenuTrigger className="border p-2 px-4 rounded-md text-sm">
         Select
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="overflow-y-scroll max-h-[500px]">
+      <DropdownMenuContent className="overflow-y-scroll max-h-[400px]">
         <DropdownMenuLabel>Tags</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {tags.map((item) => {
@@ -581,7 +601,6 @@ const TagsMenu = ({
               onClick={() => {
                 addTag(item);
               }}
-              className="border-b rounded-none"
             >
               {item.name}
             </DropdownMenuItem>
@@ -597,7 +616,7 @@ type SubTopicType = {
   name: string;
   description: string;
   subjectTopicId: string;
-  tagId: string[];
+  tagId: TagType[];
   createdAt: string;
   updatedAt: string;
 };
