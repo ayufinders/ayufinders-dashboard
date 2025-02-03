@@ -296,11 +296,14 @@ const AddSubTopic = ({
           </ToggleGroup>
 
           <div className="flex flex-row gap-4 mt-4">
-            <TagsMenu
-              selectedTags={selectedTags}
-              tags={tags}
-              setSelectedTags={setSelectedTags}
-            />
+            <div className="max-w-60 overflow-y-scroll">
+              <TagsMenu
+                selectedTags={selectedTags}
+                tags={tags}
+                setSelectedTags={setSelectedTags}
+              />
+            </div>
+            
             <div className="w-80 overflow-x-scroll p-1 border flex-row flex gap-1">
               {selectedTags.map((tag) => {
                 return (
@@ -434,7 +437,7 @@ const UpdateSubTopicDialog = ({
             rows={2}
             placeholder="Sub Topic Description (optional)"
           ></Textarea>
-          <div className="flex flex-row gap-4">
+          <div className="overflow-y-scroll flex flex-row gap-4">
             <TagsMenu
               selectedTags={selectedTags}
               tags={tags}
@@ -560,7 +563,7 @@ const TagsMenu = ({
       <DropdownMenuTrigger className="border p-2 px-4 rounded-md text-sm">
         Select
       </DropdownMenuTrigger>
-      <DropdownMenuContent>
+      <DropdownMenuContent className="overflow-y-scroll max-h-[500px]">
         <DropdownMenuLabel>Tags</DropdownMenuLabel>
         <DropdownMenuSeparator />
         {tags.map((item) => {
@@ -570,6 +573,7 @@ const TagsMenu = ({
               onClick={() => {
                 addTag(item);
               }}
+              className="border-b rounded-none"
             >
               {item.name}
             </DropdownMenuItem>
