@@ -41,6 +41,7 @@ const SubjectTopics = () => {
   >([]);
   const [search, setSearch] = useState("");
 
+  const router = useRouter()
   const params = useParams();
   const paperId = params.paperId;
   const paperName = decodeURIComponent(params.paperName as string);
@@ -124,6 +125,13 @@ const SubjectTopics = () => {
               fetchSections={fetchSections}
               paperId={paperId as string}
             />
+            <Button
+            onClick={()=>{
+              router.back()
+            }}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>
@@ -191,7 +199,7 @@ const SubjectTopicList = ({
             <TableCell className="flex flex-row gap-2">
               <Button
                 onClick={() => {
-                  router.replace(
+                  router.push(
                     `/syllabus/subject/paper/subjectTopic/subTopic/${sub._id}/${sub.name}`
                   );
                 }}

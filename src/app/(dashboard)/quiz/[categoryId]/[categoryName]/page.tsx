@@ -1,6 +1,6 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import axios from "axios";
 import {
   Table,
@@ -78,6 +78,8 @@ const TopicQuestions = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const router = useRouter()
+
   if (!categoryId) return <>No quiz found.</>;
 
   return (
@@ -100,6 +102,11 @@ const TopicQuestions = () => {
               fetchQues={fetchQuestions}
               categoryId={categoryId as string}
             />
+            <Button
+            onClick={()=>{
+              router.back()
+            }}
+            >Back</Button>
           </div>
         </div>
       </div>

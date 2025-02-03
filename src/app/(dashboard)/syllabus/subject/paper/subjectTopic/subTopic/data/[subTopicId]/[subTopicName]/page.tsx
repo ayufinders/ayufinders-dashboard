@@ -47,6 +47,7 @@ const SubTopicData = () => {
   const [videos, setVideos] = useState<VideoType[]>([]);
   const [docs, setDocs] = useState<DocType[]>([]);
 
+  const router = useRouter();
   const params = useParams();
   const subTopicId = params.subTopicId;
   const subTopicName = decodeURIComponent(params.subTopicName as string);
@@ -99,7 +100,15 @@ const SubTopicData = () => {
                 className="p-2 w-[200px]"
                 placeholder="Search for Questions..."
               />
+              
             </div>
+            <Button
+              onClick={()=>{
+                router.back()
+              }}
+              >
+                Back
+              </Button>
           </div>
         </div>
       </div>

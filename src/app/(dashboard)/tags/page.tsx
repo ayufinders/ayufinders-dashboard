@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Trash } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
+import { useRouter } from "next/navigation";
 
 const Tags = () => {
   const [tags, setTags] = useState<tagType[]>([]);
@@ -61,6 +62,8 @@ const Tags = () => {
     fetchTags();
   }, []);
 
+  const router = useRouter()
+
   return (
     <main className="p-4 relative">
       <div className="sticky top-0 p-4">
@@ -77,6 +80,13 @@ const Tags = () => {
               ></Input>
             </div>
             <AddTag fetchTags={fetchTags} />
+            <Button
+            onClick={()=>{
+              router.replace('/')
+            }}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>

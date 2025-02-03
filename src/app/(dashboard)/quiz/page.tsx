@@ -64,7 +64,7 @@ const Quiz = () => {
   useEffect(() => {
     fetchTopics();
   }, []);
-
+  const router = useRouter()
   return (
     <main className="p-4 relative">
       <div className="sticky z-50 top-0">
@@ -77,6 +77,11 @@ const Quiz = () => {
               placeholder="Search for topics..."
             />
             <AddTopic fetchTopics={fetchTopics} />
+            <Button
+            onClick={()=>{
+              router.replace('/')
+            }}
+            >Back</Button>
           </div>
         </div>
       </div>

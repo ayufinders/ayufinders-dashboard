@@ -24,6 +24,8 @@ const Subject = () => {
   const params = useParams();
   const year = params.year;
 
+  const router = useRouter()
+
   const fetchSubjects = async () => {
     try {
       const response = await axios.get(
@@ -61,7 +63,7 @@ const Subject = () => {
         <div className="flex flex-row justify-between items-center p-4">
           <p className="font-bold text-3xl">Year {year}</p>
           <div className="flex flex-row gap-2">
-            <div className="w-full sm:w-auto">
+            <div className="w-full flex flex-row gap-2 sm:w-auto">
               <Input
                 onChange={(e) => {
                   setSearch(e.target.value);
@@ -69,6 +71,13 @@ const Subject = () => {
                 className="p-2 w-full"
                 placeholder="Search for subjects..."
               />
+              <Button
+              onClick={()=>{
+                router.back()
+              }}
+              >
+                Back
+              </Button>
             </div>
           </div>
         </div>

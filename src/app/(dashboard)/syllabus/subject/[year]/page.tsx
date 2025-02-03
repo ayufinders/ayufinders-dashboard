@@ -36,6 +36,8 @@ const Subject = () => {
   const params = useParams();
   const year = params.year;
 
+  const router = useRouter()
+
   const fetchSubjects = async () => {
     try {
       const response = await axios.get(
@@ -83,6 +85,13 @@ const Subject = () => {
               />
             </div>
             <AddSubject fetchTopics={fetchSubjects} year={year as string} />
+            <Button
+            onClick={()=>{
+              router.back()
+            }}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>
@@ -131,7 +140,7 @@ const SubjectList = ({
             <TableCell className="flex gap-2">
               <Button
                 onClick={() => {
-                  router.replace(`paper/${sub._id}/${sub.name}`);
+                  router.push(`paper/${sub._id}/${sub.name}`);
                 }}
                 className="bg-gradient-to-b from-gray-600 to-gray-900 rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 duration-300 transition-all"
               >

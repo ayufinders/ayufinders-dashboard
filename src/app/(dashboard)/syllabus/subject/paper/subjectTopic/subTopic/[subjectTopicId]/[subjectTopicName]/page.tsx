@@ -44,6 +44,7 @@ const SubTopics = () => {
   );
   const [search, setSearch] = useState("");
 
+  const router = useRouter()
   const params = useParams();
   const subjectTopicId = params.subjectTopicId;
   const subjectTopicName = decodeURIComponent(
@@ -101,6 +102,13 @@ const SubTopics = () => {
               fetchTopics={fetchTopics}
               subjectTopicId={subjectTopicId as string}
             />
+            <Button
+            onClick={()=>{
+              router.back()
+            }}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>

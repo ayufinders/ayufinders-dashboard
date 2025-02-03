@@ -36,6 +36,8 @@ const Papers = () => {
   const subjectId = params.subjectId;
   const subjectName = decodeURIComponent(params.subjectName as string);
 
+  const router = useRouter()
+
   const fetchPapers = async () => {
     try {
       const response = await axios.get(
@@ -86,6 +88,13 @@ const Papers = () => {
               fetchTopics={fetchPapers}
               subjectId={subjectId as string}
             />
+            <Button
+            onClick={()=>{
+              router.back()
+            }}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>

@@ -75,6 +75,8 @@ const PaperSectionSubjectTopics = () => {
     //eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  const router = useRouter()
+
   return (
     <main className="p-4 min-w-[80vw]">
       <div className="sticky top-0 bg-white">
@@ -94,11 +96,18 @@ const PaperSectionSubjectTopics = () => {
               fetchTopics={fetchTopics}
               paperSectionId={paperSectionId as string}
             />
+            <Button
+            onClick={()=>{
+              router.back()
+            }}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>
 
-      <section className="max-h-[80vh] min-w-[80vw] border">
+      <section className="max-h-[80vh] overflow-y-scroll min-w-[80vw] border">
         <SubjectTopicList
           topics={filteredSubjectTopics}
           fetchTopics={fetchTopics}
@@ -136,7 +145,7 @@ const SubjectTopicList = ({
             <TableCell className="flex flex-row gap-2">
               <Button
                 onClick={() => {
-                  router.replace(
+                  router.push(
                     `/syllabus/subject/paper/subjectTopic/subTopic/${sub._id}/${sub.name}`
                   );
                 }}

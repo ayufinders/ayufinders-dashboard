@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import Spinner from "@/components/Spinner";
 import { ChevronRight, SquareArrowOutUpRightIcon, Trash } from "lucide-react";
@@ -37,6 +37,8 @@ const Papers = () => {
   const params = useParams();
   const subjectId = params.subjectId;
   const subjectName = decodeURIComponent(params.subjectName as string);
+
+  const router = useRouter()
 
   const fetchPapers = async () => {
     try {
@@ -90,6 +92,13 @@ const Papers = () => {
               fetchTopics={fetchPapers}
               subjectId={subjectId as string}
             />
+            <Button
+            onClick={()=>{
+              router.back()
+            }}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>

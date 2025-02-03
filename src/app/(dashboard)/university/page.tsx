@@ -26,6 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Trash } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
+import { useRouter } from "next/navigation";
 
 const Universities = () => {
   const [unis, setUnis] = useState<UniversityType[]>([]);
@@ -61,6 +62,8 @@ const Universities = () => {
     fetchData();
   }, []);
 
+  const router = useRouter()
+
   return (
     <main className="p-4 relative">
       <div className="sticky top-0 p-4">
@@ -76,7 +79,14 @@ const Universities = () => {
                 placeholder="Search for tags..."
               ></Input>
             </div>
-            <AddTag fetchData={fetchData} />
+            <AddUniversity fetchData={fetchData} />
+            <Button
+            onClick={()=>{
+              router.replace('/')
+            }}
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>
@@ -88,7 +98,7 @@ const Universities = () => {
   );
 };
 
-const AddTag = ({ fetchData }: { fetchData: () => void }) => {
+const AddUniversity = ({ fetchData }: { fetchData: () => void }) => {
   const [name, setName] = useState("");
   const [desc, setDesc] = useState("");
   const [loading, setLoading] = useState(false);
