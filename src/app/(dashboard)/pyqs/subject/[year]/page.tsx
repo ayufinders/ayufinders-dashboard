@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useRouter, useParams } from "next/navigation";
 import { ChevronRight } from "lucide-react";
+import { SubjectType } from "@/types";
 
 const Subject = () => {
   const [subjects, setSubjects] = useState<SubjectType[]>([]);
@@ -89,13 +90,6 @@ const Subject = () => {
   );
 };
 
-type SubjectType = {
-  _id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-};
 
 const SubjectList = ({
   subjects,

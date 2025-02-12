@@ -27,6 +27,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Trash } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
+import { SubjectType } from "@/types";
 
 const Subject = () => {
   const [subjects, setSubjects] = useState<SubjectType[]>([]);
@@ -102,13 +103,6 @@ const Subject = () => {
   );
 };
 
-type SubjectType = {
-  _id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-};
 
 const SubjectList = ({
   subjects,

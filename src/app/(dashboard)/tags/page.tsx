@@ -27,11 +27,12 @@ import { ChevronRight, Trash } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
 import { useRouter } from "next/navigation";
+import { TagType } from "@/types";
 
 const Tags = () => {
-  const [tags, setTags] = useState<tagType[]>([]);
+  const [tags, setTags] = useState<TagType[]>([]);
   const [search, setSearch] = useState("");
-  const [filteredTags, setFilteredTags] = useState<tagType[]>([]);
+  const [filteredTags, setFilteredTags] = useState<TagType[]>([]);
 
   useEffect(() => {
     const searchedTags = tags.filter((tag) =>
@@ -199,10 +200,10 @@ const EditTag = ({
   tag,
 }: {
   fetchTags: () => void;
-  tag: tagType;
+  tag: TagType;
 }) => {
-  const [tagName, setTagName] = useState("");
-  const [tagDesc, setTagDesc] = useState("");
+  const [tagName, setTagName] = useState(tag.name);
+  const [tagDesc, setTagDesc] = useState(tag.description);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -295,25 +296,12 @@ const EditTag = ({
   );
 };
 
-type tagType = {
-  _id: string;
-  name: string;
-  description: string;
-  questions: string[];
-  createdBy: Admin;
-};
-
-type Admin = {
-  _id: string;
-  name: string;
-  email: string;
-};
 
 const TagList = ({
   tags,
   fetchTags,
 }: {
-  tags: tagType[];
+  tags: TagType[];
   fetchTags: () => void;
 }) => {
   return (
@@ -329,7 +317,7 @@ const TagList = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {tags.map((tag: tagType, index) => (
+        {tags.map((tag: TagType, index) => (
           <TableRow key={index}>
             <TableCell className="font-medium">{index + 1}</TableCell>
             <TableCell className="font-medium">{tag.name}</TableCell>

@@ -18,14 +18,7 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { TagType } from "@/types";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/hooks/use-toast";
@@ -36,6 +29,8 @@ import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
 import { Label } from "@/components/ui/label";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import TagsMenu from "@/components/TagsMenu";
+import { SubTopicType } from "@/types";
 
 const SubTopics = () => {
   const [subTopics, setSubTopics] = useState<SubTopicType[]>([]);
@@ -181,9 +176,9 @@ const AddSubTopic = ({
   const [subTopicName, setSubTopicName] = useState("");
   const [subTopicDesc, setSubTopicDesc] = useState("");
   const [type, setType] = useState("");
-  const [year, setYear] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const {user, selectedYear} = useUserContext()
 
   const addSubTopicHandler = async () => {
     try {
@@ -195,8 +190,40 @@ const AddSubTopic = ({
           description: subTopicDesc,
           subjectTopicId: subjectTopicId,
           tagId: selectedTags,
-          year,
+          year: selectedYear,
           type,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          },
+          withCredentials: true,
+        }
+      );
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/`,
+        {
+          name: subTopicName,
+          description: subTopicDesc,
+          year: selectedYear,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          },
+          withCredentials: true,
+        }
+      );
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/tag/`,
+        {
+          name: subTopicName,
+          description: subTopicDesc,
+          createdBy: user.id,
         },
         {
           headers: {
@@ -225,33 +252,14 @@ const AddSubTopic = ({
     } finally {
       setSubTopicName("");
       setSubTopicDesc("");
-      setYear("");
       setType("");
       setLoading(false);
     }
   };
 
-  const [tags, setTags] = useState<TagType[]>([]);
   const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
 
-  useEffect(() => {
-    async function fetchTags() {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/tag`,
-        {
-          withCredentials: true,
-          headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
-        }
-      );
-      const tags = response.data.tags;
-      setTags(tags);
-    }
-
-    fetchTags();
-  }, []);
-
+  
   return (
     <Dialog>
       <DialogTrigger className="bg-gradient-to-b from-gray-600 to-gray-900 text-white rounded-md shadow-sm p-2 px-4 text-sm text-nowrap font-semibold hover:scale-105 duration-300 transition-all">
@@ -291,23 +299,12 @@ const AddSubTopic = ({
             <ToggleGroupItem value="NK">NK</ToggleGroupItem>
           </ToggleGroup>
 
-          <Label className="mt-4">Select Year</Label>
-          <ToggleGroup
-            type="single"
-            value={type}
-            onValueChange={setYear}
-            className="justify-start"
-          >
-            <ToggleGroupItem value="1">1</ToggleGroupItem>
-            <ToggleGroupItem value="2">2</ToggleGroupItem>
-            <ToggleGroupItem value="3">3</ToggleGroupItem>
-          </ToggleGroup>
+          
 
           <div className="flex flex-row gap-4 mt-4">
             <div>
               <TagsMenu
                 selectedTags={selectedTags}
-                tags={tags}
                 setSelectedTags={setSelectedTags}
               />
             </div>
@@ -405,27 +402,7 @@ const UpdateSubTopicDialog = ({
     }
   };
 
-  const [tags, setTags] = useState<TagType[]>([]);
   const [selectedTags, setSelectedTags] = useState<TagType[]>(subTopic.tagId);
-
-  useEffect(() => {
-    async function fetchTags() {
-      const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/tag`,
-        {
-          withCredentials: true,
-          headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
-        }
-      );
-      const tags = response.data.tags;
-      setTags(tags);
-    }
-
-    fetchTags();
-  }, []);
-
 
   return (
     <Dialog>
@@ -458,7 +435,6 @@ const UpdateSubTopicDialog = ({
             <div>
               <TagsMenu
                 selectedTags={selectedTags}
-                tags={tags}
                 setSelectedTags={setSelectedTags}
               />
             </div>
@@ -569,62 +545,6 @@ const DeleteSubTopicModalButton = ({
       </DialogContent>
     </Dialog>
   );
-};
-
-const TagsMenu = ({
-  tags,
-  selectedTags,
-  setSelectedTags,
-}: {
-  tags: TagType[];
-  selectedTags: TagType[];
-  setSelectedTags: (x: TagType[]) => void;
-}) => {
-  const addTag = (tag: TagType) => {
-    if (!selectedTags.includes(tag)) {
-      setSelectedTags([...selectedTags, tag]);
-    }
-  };
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="border p-2 px-4 rounded-md text-sm">
-        Select
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="overflow-y-scroll max-h-[400px]">
-        <DropdownMenuLabel>Tags</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {tags.map((item) => {
-          return (
-            <DropdownMenuItem
-              key={item.name}
-              onClick={() => {
-                addTag(item);
-              }}
-            >
-              {item.name}
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
-
-type SubTopicType = {
-  _id: string;
-  name: string;
-  description: string;
-  subjectTopicId: string;
-  tagId: TagType[];
-  createdAt: string;
-  updatedAt: string;
-};
-
-type TagType = {
-  _id: string;
-  name: string;
-  description: string;
 };
 
 export default SubTopics;

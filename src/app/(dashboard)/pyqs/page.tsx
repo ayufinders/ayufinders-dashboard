@@ -8,15 +8,15 @@ const PreviousYearPapers = () => {
   const router = useRouter();
   const years = [
     {
-      title: 1,
+      title: "1st BAMS Professional",
       description: "All question papers for year 1 subjects",
     },
     {
-      title: 2,
+      title: "2nd BAMS Professional",
       description: "All question papers for year 2 subjects.",
     },
     {
-      title: 3,
+      title: "3rd BAMS Professional",
       description: "All question papers for year 3 subjects.",
     },
   ];

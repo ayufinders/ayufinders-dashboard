@@ -35,7 +35,15 @@ import { useUserContext } from "@/context";
 import { Copy, Trash } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { QuestionType, DocType, VideoType, FileUpload } from "@/types";
 
 const SubTopicData = () => {
   const [mcqQuestions, setMcqQuestions] = useState<QuestionType[]>([]);
@@ -59,8 +67,8 @@ const SubTopicData = () => {
         {
           withCredentials: true,
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
       );
       const data = response.data.data;
@@ -100,15 +108,14 @@ const SubTopicData = () => {
                 className="p-2 w-[200px]"
                 placeholder="Search for Questions..."
               />
-              
             </div>
             <Button
-              onClick={()=>{
-                router.back()
+              onClick={() => {
+                router.back();
               }}
-              >
-                Back
-              </Button>
+            >
+              Back
+            </Button>
           </div>
         </div>
       </div>
@@ -199,7 +206,7 @@ const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
   const [videoDesc, setVideoDesc] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [lang, setLang] = useState<string>("eng")
+  const [lang, setLang] = useState<string>("eng");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -244,7 +251,7 @@ const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -269,9 +276,9 @@ const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
             fileType: thumbnailData.fileType,
           },
           {
-            headers: { 
+            headers: {
               "Content-Type": "application/json",
-              'Authorization': 'Bearer ' + localStorage.getItem("token")
+              Authorization: "Bearer " + localStorage.getItem("token"),
             },
             withCredentials: true,
           }
@@ -281,7 +288,7 @@ const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
 
         // Upload the thumbnail to S3
         await axios.put(thumbUrl, thumbnailData.file, {
-          headers: { 
+          headers: {
             "Content-Type": thumbnailData.fileType,
           },
         });
@@ -303,12 +310,12 @@ const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
           createdBy: user.id,
           thumbnailKey: thumbnailKey,
           key: key,
-          language: lang
+          language: lang,
         },
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -456,7 +463,7 @@ const UploadDocFile = ({ fetchData }: { fetchData: () => void }) => {
   const [docDesc, setDocDesc] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const [lang, setLang] = useState("eng")
+  const [lang, setLang] = useState("eng");
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -501,7 +508,7 @@ const UploadDocFile = ({ fetchData }: { fetchData: () => void }) => {
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -525,9 +532,9 @@ const UploadDocFile = ({ fetchData }: { fetchData: () => void }) => {
             fileType: thumbnailData.fileType,
           },
           {
-            headers: { 
+            headers: {
               "Content-Type": "application/json",
-              'Authorization': 'Bearer ' + localStorage.getItem("token")
+              Authorization: "Bearer " + localStorage.getItem("token"),
             },
             withCredentials: true,
           }
@@ -558,12 +565,12 @@ const UploadDocFile = ({ fetchData }: { fetchData: () => void }) => {
           key: key,
           thumbnailKey: thumbnailKey,
           subTopicId: subTopicId,
-          language: lang
+          language: lang,
         },
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -725,8 +732,8 @@ const DeleteVideoModalButton = ({
         {
           withCredentials: true,
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
       );
       await axios.delete(
@@ -734,8 +741,8 @@ const DeleteVideoModalButton = ({
         {
           withCredentials: true,
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
       );
 
@@ -809,8 +816,8 @@ const DeleteDocModalButton = ({
         {
           withCredentials: true,
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
       );
       await axios.delete(
@@ -818,8 +825,8 @@ const DeleteDocModalButton = ({
         {
           withCredentials: true,
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
       );
 
@@ -890,55 +897,6 @@ const VideoPreview = ({
       </Button>
     </div>
   );
-};
-
-interface FileUpload {
-  fileName: string;
-  fileDesc: string;
-  fileType: string;
-  file: File;
-}
-
-type VideoType = {
-  _id: string;
-  name: string;
-  description: string;
-  createdBy: Admin;
-  url: string;
-  key: string;
-};
-
-type DocType = {
-  _id: string;
-  name: string;
-  description: string;
-  createdBy: Admin;
-  url: string;
-  key: string;
-};
-
-type QuestionType = {
-  _id: string;
-  text: string;
-  options: OptionType[];
-  correctOption: number;
-  explanation?: string;
-  reference: {
-    title?: string;
-    link?: string;
-  };
-  categoryId: string;
-  tagId: string[];
-  createdBy: Admin;
-};
-
-type Admin = {
-  name: string;
-  _id: string;
-};
-
-type OptionType = {
-  text: string;
 };
 
 export default SubTopicData;

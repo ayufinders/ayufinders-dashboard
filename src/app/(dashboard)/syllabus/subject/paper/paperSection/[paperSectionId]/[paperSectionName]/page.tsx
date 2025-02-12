@@ -26,9 +26,8 @@ import { useRouter, useParams } from "next/navigation";
 import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Trash } from "lucide-react"; // Importing icons
 import Spinner from "@/components/Spinner";
+import { SubjectTopicType } from "@/types";
 import { useUserContext } from "@/context";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { Label } from "@/components/ui/label";
 
 const PaperSectionSubjectTopics = () => {
   const [subjectTopics, setSubjectTopics] = useState<SubjectTopicType[]>([]);
@@ -180,9 +179,9 @@ const AddSubjectTopic = ({
 }) => {
   const [subjectTopicName, setSubjectTopicName] = useState("");
   const [subjectTopicDesc, setSubjectTopicDesc] = useState("");
-  const [year, setYear] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const {user, selectedYear} = useUserContext()
 
   const addSubjectTopicHandler = async () => {
     try {
@@ -193,7 +192,39 @@ const AddSubjectTopic = ({
           name: subjectTopicName,
           description: subjectTopicDesc,
           paperSectionId: paperSectionId,
-          year,
+          year: selectedYear
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          },
+          withCredentials: true,
+        }
+      );
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/`,
+        {
+          name: subjectTopicName,
+          description: subjectTopicDesc,
+          year: selectedYear
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          },
+          withCredentials: true,
+        }
+      );
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/tag/`,
+        {
+          name: subjectTopicName,
+          description: subjectTopicDesc,
+          createdBy: user.id,
         },
         {
           headers: {
@@ -222,7 +253,6 @@ const AddSubjectTopic = ({
     } finally {
       setSubjectTopicName("");
       setSubjectTopicDesc("");
-      setYear("");
       setLoading(false);
     }
   };
@@ -253,17 +283,7 @@ const AddSubjectTopic = ({
             rows={2}
             placeholder="Subject Description (optional)"
           ></Textarea>
-          <Label className="mt-4">Select Year</Label>
-          <ToggleGroup
-            type="single"
-            value={year}
-            onValueChange={setYear}
-            className="justify-start"
-          >
-            <ToggleGroupItem value="1">1</ToggleGroupItem>
-            <ToggleGroupItem value="2">2</ToggleGroupItem>
-            <ToggleGroupItem value="3">3</ToggleGroupItem>
-          </ToggleGroup>
+          
         </div>
         <DialogFooter>
           <Button
@@ -451,14 +471,5 @@ const DeleteSubjectTopicModalButton = ({
   );
 };
 
-type SubjectTopicType = {
-  _id: string;
-  name: string;
-  description: string;
-  paperId: string;
-  tagId: string[];
-  createdAt: string;
-  updatedAt: string;
-};
 
 export default PaperSectionSubjectTopics;

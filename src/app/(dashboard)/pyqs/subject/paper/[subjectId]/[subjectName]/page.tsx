@@ -28,10 +28,11 @@ import { ChevronRight, SquareArrowOutUpRightIcon, Trash } from "lucide-react";
 import { useUserContext } from "@/context";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { UniversityType, QuestionPaperType, FileUpload } from "@/types";
 
 const Papers = () => {
-  const [papers, setPapers] = useState<PaperType[]>([]);
-  const [filteredPapers, setFilteredPapers] = useState<PaperType[]>([]);
+  const [papers, setPapers] = useState<QuestionPaperType[]>([]);
+  const [filteredPapers, setFilteredPapers] = useState<QuestionPaperType[]>([]);
   const [search, setSearch] = useState("");
 
   const params = useParams();
@@ -110,29 +111,14 @@ const Papers = () => {
   );
 };
 
-type PaperType = {
-  _id: string;
-  name: string;
-  description: string;
-  createdAt: string;
-  updatedAt: string;
-  createdBy: Admin;
-  url: string;
-  year: string;
-  month: string;
-  key: string;
-  university: UniversityType
-};
 
-type Admin = {
-  name: string;
-};
+
 
 const PaperList = ({
   papers,
   fetchTopics,
 }: {
-  papers: PaperType[];
+  papers: QuestionPaperType[];
   fetchTopics: () => void;
 }) => {
   return (
@@ -150,7 +136,7 @@ const PaperList = ({
         </TableRow>
       </TableHeader>
       <TableBody>
-        {papers.map((sub: PaperType, index: number) => (
+        {papers.map((sub: QuestionPaperType, index: number) => (
           <TableRow key={index} className="cursor-pointer hover:bg-gray-50">
             <TableCell className="font-medium">{index + 1}</TableCell>
             <TableCell className="font-medium">{sub.month}</TableCell>
@@ -440,7 +426,7 @@ const EditPaper = ({
   paper,
 }: {
   fetchData: () => void;
-  paper: PaperType;
+  paper: QuestionPaperType;
 }) => {
   const [name, setName] = useState(paper.name);
   const [desc, setDesc] = useState(paper.description);
@@ -662,19 +648,6 @@ const DeleteModalButton = ({
   );
 };
 
-interface FileUpload {
-  fileName: string;
-  fileDesc: string;
-  fileType: string;
-  file: File;
-}
-
-type UniversityType = {
-  _id: string;
-  name: string;
-  description: string;
-  createdBy: Admin;
-};
 
 const months = [
   'January',

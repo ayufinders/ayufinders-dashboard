@@ -27,6 +27,7 @@ import { ChevronRight, Trash } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
 import { useRouter } from "next/navigation";
+import { UniversityType } from "@/types";
 
 const Universities = () => {
   const [unis, setUnis] = useState<UniversityType[]>([]);
@@ -295,18 +296,6 @@ const EditUniversity = ({
   );
 };
 
-type UniversityType = {
-  _id: string;
-  name: string;
-  description: string;
-  createdBy: Admin;
-};
-
-type Admin = {
-  _id: string;
-  name: string;
-  email: string;
-};
 
 const UniversityList = ({
   unis,

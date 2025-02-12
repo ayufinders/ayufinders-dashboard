@@ -26,8 +26,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { ChevronRight, Trash } from "lucide-react"; // Importing icons
 import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
-import { Label } from "@/components/ui/label";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { PaperSectionType, SubjectTopicType } from "@/types";
 
 const SubjectTopics = () => {
   const [subjectTopics, setSubjectTopics] = useState<SubjectTopicType[]>([]);
@@ -86,11 +85,11 @@ const SubjectTopics = () => {
 
   useEffect(() => {
     const filteredTopics = subjectTopics.filter((topic) =>
-      topic.name.toLowerCase().includes(search)
+      topic.name.toLowerCase().includes(search.toLowerCase())
     );
 
     const filteredSections = paperSections.filter((section) =>
-      section.name.toLowerCase().includes(search)
+      section.name.toLowerCase().includes(search.toLowerCase())
     );
     setFilteredSubjectTopics(filteredTopics);
     setFilteredPaperSections(filteredSections);
@@ -161,15 +160,6 @@ const SubjectTopics = () => {
   );
 };
 
-type SubjectTopicType = {
-  _id: string;
-  name: string;
-  description: string;
-  paperId: string;
-  tagId: string[];
-  createdAt: string;
-  updatedAt: string;
-};
 
 const SubjectTopicList = ({
   topics,
@@ -288,9 +278,9 @@ const AddSubjectTopic = ({
 }) => {
   const [subjectTopicName, setSubjectTopicName] = useState("");
   const [subjectTopicDesc, setSubjectTopicDesc] = useState("");
-  const [year, setYear] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
+  const {user, selectedYear} = useUserContext()
 
   const addSubjectTopicHandler = async () => {
     try {
@@ -301,7 +291,7 @@ const AddSubjectTopic = ({
           name: subjectTopicName,
           description: subjectTopicDesc,
           paperId: paperId,
-          year,
+          year: selectedYear,
         },
         {
           headers: {
@@ -311,6 +301,39 @@ const AddSubjectTopic = ({
           withCredentials: true,
         }
       );
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/`,
+        {
+          name: subjectTopicName,
+          description: subjectTopicDesc,
+          year: selectedYear,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          },
+          withCredentials: true,
+        }
+      );
+
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/tag/`,
+        {
+          name: subjectTopicName,
+          description: subjectTopicDesc,
+          createdBy: user.id,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            'Authorization': 'Bearer ' + localStorage.getItem("token")
+          },
+          withCredentials: true,
+        }
+      );
+
 
       if (!response.data.success) {
         toast({
@@ -330,7 +353,6 @@ const AddSubjectTopic = ({
     } finally {
       setSubjectTopicName("");
       setSubjectTopicDesc("");
-      setYear("");
       setLoading(false);
     }
   };
@@ -361,17 +383,7 @@ const AddSubjectTopic = ({
             rows={2}
             placeholder="Subject Description (optional)"
           ></Textarea>
-          <Label className="mt-4">Select Year</Label>
-          <ToggleGroup
-            type="single"
-            value={year}
-            onValueChange={setYear}
-            className="justify-start"
-          >
-            <ToggleGroupItem value="1">1</ToggleGroupItem>
-            <ToggleGroupItem value="2">2</ToggleGroupItem>
-            <ToggleGroupItem value="3">3</ToggleGroupItem>
-          </ToggleGroup>
+          
         </div>
         <DialogFooter>
           <Button
@@ -823,11 +835,6 @@ const DeletePaperSectionModalButton = ({
   );
 };
 
-type PaperSectionType = {
-  _id: string;
-  name: string;
-  description: string;
-  paperId: string;
-};
+
 
 export default SubjectTopics;

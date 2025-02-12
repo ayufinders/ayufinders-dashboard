@@ -10,14 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,9 +27,11 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { useToast } from "@/hooks/use-toast";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
-import { ChevronRight, RefreshCwIcon, Trash } from "lucide-react";
+import { ChevronRight, Trash } from "lucide-react";
 import Spinner from "@/components/Spinner";
 import { useUserContext } from "@/context";
+import { QuestionType, TagType } from "@/types";
+import TagsMenu from "@/components/TagsMenu";
 
 const TopicQuestions = () => {
   const params = useParams();
@@ -253,48 +248,6 @@ const DeleteModalButton = ({
   );
 };
 
-const TagsMenu = ({
-  tags,
-  questionTags,
-  selectedTags,
-  setSelectedTags,
-}: {
-  tags: TagType[];
-  questionTags: string[];
-  selectedTags: string[];
-  setSelectedTags: (tags: string[]) => void;
-}) => {
-
-  const addTag = (id: string) => {
-    if (!selectedTags.includes(id) && !questionTags.includes(id)) {
-      setSelectedTags([...selectedTags, id]);
-    }
-  };
-
-  return (
-    <DropdownMenu>
-      <DropdownMenuTrigger className="border p-2 px-4 w-[100px] rounded-md text-sm">
-        Select
-      </DropdownMenuTrigger>
-      <DropdownMenuContent className="overflow-y-scroll max-h-[800px]">
-        <DropdownMenuLabel>Tags</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        {tags.map((item) => {
-          return (
-            <DropdownMenuItem
-              key={item.name}
-              onClick={() => {
-                addTag(item._id);
-              }}
-            >
-              {item.name}
-            </DropdownMenuItem>
-          );
-        })}
-      </DropdownMenuContent>
-    </DropdownMenu>
-  );
-};
 
 const CreateQuestionDialog = ({
   categoryId,
@@ -304,8 +257,7 @@ const CreateQuestionDialog = ({
   fetchQues: () => void;
 }) => {
   const [loading, setLoading] = useState(false);
-  const [tags, setTags] = useState<TagType[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>([]);
+  const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
 
   const [quesText, setQuesText] = useState("");
   const [op1, setOp1] = useState("");
@@ -328,22 +280,8 @@ const CreateQuestionDialog = ({
 
   const { toast } = useToast();
 
-  const fetchTags = async () => {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/tag`,
-      {
-        withCredentials: true,
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem("token")
-        }
-      }
-    );
-    const tags = response.data.tags;
-    setTags(tags);
-  };
-
   const removeTag = (id: string) => {
-    const updatedTags = selectedTags.filter((tagId) => tagId !== id);
+    const updatedTags = selectedTags.filter((tag) => tag._id !== id);
     setSelectedTags(updatedTags);
   };
 
@@ -445,10 +383,6 @@ const CreateQuestionDialog = ({
     }
   };
 
-  useEffect(() => {
-    fetchTags();
-  }, []);
-
   const handleToggle = (value: string) => {
     setCorrectOp(Number(value));
   };
@@ -549,38 +483,31 @@ const CreateQuestionDialog = ({
             <Label htmlFor="tags" className="text-center grid-cols-1">
               Tags
             </Label>
-            <Button variant={"outline"} onClick={fetchTags}>
-              <RefreshCwIcon />
-            </Button>
+            
             <div className="w-full flex flex-row gap-2 items-center">
               <TagsMenu
-                tags={tags}
                 questionTags={[]}
                 selectedTags={selectedTags}
                 setSelectedTags={setSelectedTags}
               />
               <div className="border rounded-md w-full flex flex-row h-12 gap-2 p-1 overflow-x-scroll">
-                {selectedTags.map((tagId: string) => {
-                  return tags.map((tag: TagType) => {
-                    if (tag._id == tagId) {
-                      return (
-                        <div
-                          key={tag._id}
-                          className="bg-gray-100 w-fit text-nowrap p-2 text-sm flex flex-row items-center gap-4 justify-between rounded-md"
-                        >
-                          <div className="text-right">{tag.name}</div>
-                          <div
-                            onClick={() => {
-                              removeTag(tag._id);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            x
-                          </div>
-                        </div>
-                      );
-                    }
-                  });
+                {selectedTags.map((tag: TagType) => {
+                  return (
+                    <div
+                      key={tag._id}
+                      className="bg-gray-100 w-fit text-nowrap p-2 text-sm flex flex-row items-center gap-4 justify-between rounded-md"
+                    >
+                      <div className="text-right">{tag.name}</div>
+                      <div
+                        onClick={() => {
+                          removeTag(tag._id);
+                        }}
+                        className="cursor-pointer"
+                      >
+                        x
+                      </div>
+                    </div>
+                  );
                 })}
               </div>
             </div>
@@ -914,19 +841,14 @@ const UpdateQuestionDialog = ({
   question: QuestionType;
   fetchQues: () => void;
 }) => {
-  const questionTagIds = question.tagId.map((tag) => tag._id);
-  const [tags, setTags] = useState<TagType[]>([]);
-  const [selectedTags, setSelectedTags] = useState<string[]>(questionTagIds);
-  console.log(questionTagIds);
+  const [selectedTags, setSelectedTags] = useState<TagType[]>(question.tagId);
 
   const [quesText, setQuesText] = useState(question.text);
   const [op1, setOp1] = useState(question.options[0].text);
   const [op2, setOp2] = useState(question.options[1].text);
   const [op3, setOp3] = useState(question.options[2].text);
   const [op4, setOp4] = useState(question.options[3].text);
-  const [correctOp, setCorrectOp] = useState<number | null>(
-    question.correctOption
-  );
+  const [correctOp, setCorrectOp] = useState<number | null>(null);
   const [explanation, setExplanation] = useState(question.explanation);
   const [refTitle, setRefTitle] = useState(question.reference.title);
   const [link, setLink] = useState(question.reference.link);
@@ -948,22 +870,9 @@ const UpdateQuestionDialog = ({
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
 
-  const fetchTags = async () => {
-    const response = await axios.get(
-      `${process.env.NEXT_PUBLIC_BASE_URL}/tag`,
-      {
-        withCredentials: true,
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem("token")
-        }
-      }
-    );
-    const tags = response.data.tags;
-    setTags(tags);
-  };
 
   const removeTag = (id: string) => {
-    const updatedTags = selectedTags.filter((tagId) => tagId != id);
+    const updatedTags = selectedTags.filter((tag) => tag._id != id);
     setSelectedTags(updatedTags);
   };
 
@@ -1041,7 +950,6 @@ const UpdateQuestionDialog = ({
       console.log(error);
     } finally {
       fetchQues();
-      setSelectedTags([]);
       setLoading(false);
     }
   };
@@ -1049,10 +957,6 @@ const UpdateQuestionDialog = ({
   const handleToggle = (value: string) => {
     setCorrectOp(Number(value) === correctOp ? null : Number(value));
   };
-
-  useEffect(() => {
-    fetchTags();
-  }, []);
 
   return (
     <Dialog>
@@ -1064,8 +968,8 @@ const UpdateQuestionDialog = ({
       <DialogContent className="sm:max-w-[90vw]">
         <DialogHeader>
           <DialogTitle>Edit Question</DialogTitle>
-          <DialogDescription className="text-red-500 font-medium underline">
-              ENTER CORRECT OPTION AND TAGS AGAIN WHILE UPDATING
+          <DialogDescription className="">
+              Update question
           </DialogDescription>
         </DialogHeader>
         <div className="flex flex-row gap-4 justify-evenly w-full">
@@ -1153,34 +1057,31 @@ const UpdateQuestionDialog = ({
 
             <div className="w-full flex flex-row gap-2 items-center">
               <TagsMenu
-                tags={tags}
                 questionTags={[]}
                 selectedTags={selectedTags}
                 setSelectedTags={setSelectedTags}
               />
               <div className="border rounded-md w-full flex flex-row h-12 gap-2 p-1 overflow-x-scroll">
-                {selectedTags.map((tagId: string) => {
-                  return tags.map((tag: TagType) => {
-                    if (tag._id == tagId) {
-                      return (
+                {
+                  selectedTags.map((tag: TagType) => {
+                    return (
+                      <div
+                        key={tag._id}
+                        className="bg-gray-100 w-fit text-nowrap p-2 text-sm flex flex-row items-center gap-4 justify-between rounded-md"
+                      >
+                        <div className="text-right">{tag.name}</div>
                         <div
-                          key={tag._id}
-                          className="bg-gray-100 w-fit text-nowrap p-2 text-sm flex flex-row items-center gap-4 justify-between rounded-md"
+                          onClick={() => {
+                            removeTag(tag._id);
+                          }}
+                          className="cursor-pointer"
                         >
-                          <div className="text-right">{tag.name}</div>
-                          <div
-                            onClick={() => {
-                              removeTag(tag._id);
-                            }}
-                            className="cursor-pointer"
-                          >
-                            x
-                          </div>
+                          x
                         </div>
-                      );
-                    }
-                  });
-                })}
+                      </div>
+                    );
+                  })
+                }
               </div>
             </div>
           </div>
@@ -1254,7 +1155,7 @@ const ViewQuestionDialog = ({ question }: { question: QuestionType }) => {
           <div className="flex flex-col bg-gray-50 rounded-lg">
             <p className="font-semibold">Tags</p>
             <div className="flex flex-row overflow-x-scroll w-84 p-1 gap-2 rounded-lg border">
-              {question.tagId.map((tag) => (
+              {question.tagId.map((tag: TagType) => (
                 <div
                   className="bg-gray-100 rounded-lg p-2 text-nowrap"
                   key={tag._id}
@@ -1268,44 +1169,6 @@ const ViewQuestionDialog = ({ question }: { question: QuestionType }) => {
       </DialogContent>
     </Dialog>
   );
-};
-
-type QuestionType = {
-  _id: string;
-  text: string;
-  textHindi: string;
-  options: OptionType[];
-  optionsHindi: OptionType[];
-  correctOption: number;
-  explanation?: string;
-  explanationHindi?: string;
-  reference: {
-    title?: string;
-    link?: string;
-  };
-  referenceHindi: {
-    title?: string;
-    link?: string;
-  };
-  categoryId: string;
-  tagId: TagType[];
-  createdBy: AdminType;
-};
-
-type OptionType = {
-  text: string;
-};
-type TagType = {
-  _id: string;
-  name: string;
-  description: string;
-  questions: QuestionType[];
-};
-
-type AdminType = {
-  name: string;
-  email: string;
-  id: string;
 };
 
 export default TopicQuestions;
