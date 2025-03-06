@@ -10,14 +10,17 @@ const PreviousYearPapers = () => {
     {
       title: "1st BAMS Professional",
       description: "All question papers for year 1 subjects",
+      year: 1
     },
     {
       title: "2nd BAMS Professional",
       description: "All question papers for year 2 subjects.",
+      year: 2
     },
     {
       title: "3rd BAMS Professional",
       description: "All question papers for year 3 subjects.",
+      year: 3
     },
   ];
 
@@ -48,7 +51,7 @@ const PreviousYearPapers = () => {
             <div>
               <Button
                 className="bg-gradient-to-b from-gray-600 to-gray-900 text-white hover:scale-105 transition-all duration-300"
-                onClick={() => router.push(`pyqs/subject/${year.title}`)}
+                onClick={() => router.push(`pyqs/subject/${year.year}`)}
               >
                 View <ChevronRight />
               </Button>
