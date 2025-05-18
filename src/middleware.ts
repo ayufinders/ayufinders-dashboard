@@ -3,18 +3,22 @@ import type { NextRequest } from 'next/server';
 
 export function middleware(request: NextRequest) {
   const currentPath = request.nextUrl.pathname;
-  
   const cookies = request.cookies.get('authToken');
-  const isLoggedIn = cookies?.value
+  const isLoggedIn = !!cookies?.value;
 
-  // Redirect if the user is logged in and tries to access the homepage
+  // Redirect logged-in users away from the signin page
   if (isLoggedIn && currentPath === '/signin') {
     return NextResponse.redirect(new URL('/', request.url));
   }
 
-  // Redirect if the user is not logged in and tries to access protected routes
-  const protectedPaths = ['/', '/tags', '/syllabus', '/quiz'];
-  if (!isLoggedIn && protectedPaths.includes(currentPath)) {
+  // Define protected path prefixes
+  const protectedPrefixes = ['/', '/tags', '/syllabus', '/quiz', '/university', '/progress', '/pyqs'];
+
+  const isProtectedPath = protectedPrefixes.some((prefix) =>
+    currentPath === prefix || currentPath.startsWith(prefix + '/')
+  );
+
+  if (!isLoggedIn && isProtectedPath) {
     return NextResponse.redirect(new URL('/signin', request.url));
   }
 

@@ -38,6 +38,7 @@ const AdminDetail = () => {
       loggedIn: false,
     });
     localStorage.removeItem("user");
+    localStorage.removeItem("token");
     router.replace("/signin");
   };
 
