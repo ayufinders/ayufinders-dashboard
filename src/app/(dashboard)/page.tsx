@@ -1,8 +1,9 @@
 "use client";
 import { Button } from "@/components/ui/button";
+import { useUserContext } from "@/context";
 import { Book, Tags, Files } from "lucide-react";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { useEffect } from "react";
 
 const Dashboard = () => {
   const items = [
@@ -29,6 +30,13 @@ const Dashboard = () => {
   ];
 
   const router = useRouter();
+  const {user} = useUserContext()
+  useEffect(()=>{
+    if(user.access === "limited") {
+      router.push(`/syllabus/subject/paper/${user.subjectId}/${user.subjectName}`)
+    }
+  }, [user, router])
+
   return (
     <main className="p-4">
       <div className="font-bold text-2xl">Dashboard</div>

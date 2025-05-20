@@ -1,8 +1,10 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { useUserContext } from "@/context";
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const PreviousYearPapers = () => {
   const router = useRouter();
@@ -23,6 +25,13 @@ const PreviousYearPapers = () => {
       year: 3
     },
   ];
+
+  const {user} = useUserContext()
+  useEffect(()=>{
+    if(user.access === "limited") {
+      router.push(`/syllabus/subject/paper/${user.subjectId}/${user.subjectName}`)
+    }
+  }, [user, router])
 
   return (
     <main className="p-6 sm:w-[90vw] md:w-[80vw] lg:min-w-[80vw] mx-auto">

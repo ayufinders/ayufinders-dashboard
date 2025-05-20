@@ -6,7 +6,10 @@ type User = {
   name: string|null,
   email: string|null,
   loggedIn: boolean,
-  access: 'full'|'limited'|null
+  access: 'full'|'limited'|null,
+  subjectId: string|null,
+  subjectName: string|null,
+  year: string|null,
 }
 type AppContextType = {
   user: User;
@@ -24,7 +27,10 @@ export const AppWrapper = ({children}: {children: React.ReactNode}) => {
     name: null,
     email: null,
     loggedIn: false,
-    access: null
+    access: null,
+    subjectId: null,
+    subjectName: null,
+    year: null,
   }
 
  // Load stored values on mount

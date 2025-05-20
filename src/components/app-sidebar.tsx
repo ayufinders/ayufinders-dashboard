@@ -1,5 +1,5 @@
 "use client"
-import { Tags, Files, Settings, Book, University, Loader } from "lucide-react"
+import { Tags, Files, Book, University, Loader } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -14,50 +14,53 @@ import {
 import { usePathname, useRouter } from "next/navigation"
 import AdminDetail from "./AdminDetail"
 import { cn } from "@/lib/utils"
+import { useUserContext } from "@/context"
 
-// Menu items.
-const items = [
+export function AppSidebar() {
+  const router = useRouter()
+  const pathname = usePathname()
+  const path = pathname.split('/')[1]
+
+  const { user } = useUserContext();
+
+  const items = [
   {
     title: "Tags",
     url: "tags",
     icon: Tags,
+    visible: true,
   },
   {
     title: "Quiz",
     url: "quiz",
     icon: Files,
+    visible: true,
   },
   {
     title: "Syllabus",
     url: "syllabus",
     icon: Book,
+    visible: true,
   },
   {
     title: "PYQs",
     url: "pyqs",
     icon: Book,
+    visible: user.access === "full" ? true : false,
   },
   {
     title: "Universities",
     url: "university",
     icon: University,
+    visible: user.access === "full" ? true : false,
   },
   {
     title: "Progress",
     url: "progress",
     icon: Loader,
   },
-  {
-    title: "Settings",
-    url: "#",
-    icon: Settings,
-  },
+  
 ]
-
-export function AppSidebar() {
-  const router = useRouter()
-  const pathname = usePathname()
-  const path = pathname.split('/')[1]
   
   return (
     <Sidebar>
@@ -83,6 +86,7 @@ export function AppSidebar() {
                     }}
                     className={cn("hover:bg-gray-200 mb-1 text-gray-500 hover:text-gray-500", {
                       "bg-gray-300 font-semibold hover:bg-gray-300 hover:font-semibold": path===item.url,
+                      "hidden": item.visible === false,
                     })}
                     >
                       <item.icon className="h-6 w-6"/>

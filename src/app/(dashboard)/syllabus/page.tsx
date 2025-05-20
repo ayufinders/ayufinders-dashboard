@@ -4,10 +4,12 @@ import { Button } from "@/components/ui/button";
 import { useUserContext } from "@/context";
 import { ChevronRight } from "lucide-react";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 const Syllabus = () => {
   const router = useRouter();
-  const {setSelectedYear} = useUserContext()
+ 
+  
   const years = [
     {
       title: "1st BAMS Professional",
@@ -25,6 +27,13 @@ const Syllabus = () => {
       description: "View all subjects for year 3.",
     },
   ];
+  
+  const {setSelectedYear, user} = useUserContext()
+  useEffect(()=>{
+    if(user.access === "limited") {
+      router.push(`/syllabus/subject/paper/${user.subjectId}/${user.subjectName}`)
+    }
+  }, [user, router])
 
   return (
     <main className="p-6 sm:w-[90vw] md:w-[80vw] lg:min-w-[80vw] mx-auto">

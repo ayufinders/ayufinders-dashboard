@@ -10,7 +10,7 @@ export default function LoginPage() {
   const [error, setError] = useState("");
   const router = useRouter();
 
-  const { setUser } = useUserContext();
+  const { setUser, setSelectedYear } = useUserContext();
 
   const handleLogin = async (e: React.SyntheticEvent) => {
     e.preventDefault();
@@ -35,12 +35,21 @@ export default function LoginPage() {
           id: response.data.admin._id,
           loggedIn: true,
           access: response.data.admin.access,
+          subjectId: response.data.admin.subjectId || null,
+          subjectName: response.data.admin.subjectName || null,
+          year: response.data.admin.year || null,
         };
         setUser(user);
+        setSelectedYear(user.year);
         localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("token", response.data.token)
+        localStorage.setItem("token", response.data.token);
+
         // Redirect to the dashboard
-        router.replace("/");
+        if(user.access === "full") {
+          router.replace("/");
+        } else {
+          router.replace(`/syllabus/subject/paper/${user.subjectId}/${user.subjectName}`);
+        }
       }
     } catch (err) {
       console.log(err);

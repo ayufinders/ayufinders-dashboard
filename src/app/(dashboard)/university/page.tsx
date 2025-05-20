@@ -33,6 +33,14 @@ const Universities = () => {
   const [unis, setUnis] = useState<UniversityType[]>([]);
   const [search, setSearch] = useState("");
   const [filteredUnis, setFilteredTags] = useState<UniversityType[]>([]);
+  const router = useRouter()
+
+  const {user} = useUserContext()
+  useEffect(()=>{
+    if(user.access === "limited") {
+      router.push(`/syllabus/subject/paper/${user.subjectId}/${user.subjectName}`)
+    }
+  }, [user, router])
 
   useEffect(() => {
     const searchedUnis = unis.filter((uni) =>
@@ -63,7 +71,7 @@ const Universities = () => {
     fetchData();
   }, []);
 
-  const router = useRouter()
+  
 
   return (
     <main className="p-4 relative">
