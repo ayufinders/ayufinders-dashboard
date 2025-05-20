@@ -36,6 +36,9 @@ const AdminDetail = () => {
       id: null,
       access: null,
       loggedIn: false,
+      subjectId: null,
+      subjectName: null,
+      year: null,
     });
     localStorage.removeItem("user");
     localStorage.removeItem("token");
