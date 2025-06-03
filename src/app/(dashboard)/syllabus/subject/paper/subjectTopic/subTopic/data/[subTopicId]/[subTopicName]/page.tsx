@@ -204,7 +204,7 @@ const QuestionsList = ({
               <TableCell>{question.options[2].text}</TableCell>
               <TableCell>{question.options[3].text}</TableCell>
               <TableCell className="text-center">
-                {question.correctOption + 1}
+                {question.correctOption}
               </TableCell>
               <TableCell className="text-xs">
                 <div className="bg-gray-100 rounded-lg p-1">
