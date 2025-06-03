@@ -438,6 +438,7 @@ const CreateQuestionDialog = ({
   };
 
   const handleToggle = (value: string) => {
+    console.log(value)
     setCorrectOp(Number(value));
   };
 
