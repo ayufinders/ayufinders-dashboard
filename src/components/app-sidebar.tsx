@@ -46,7 +46,7 @@ export function AppSidebar() {
     title: "PYQs",
     url: "pyqs",
     icon: Book,
-    visible: user.access === "full" ? true : false,
+    visible: true
   },
   {
     title: "Universities",

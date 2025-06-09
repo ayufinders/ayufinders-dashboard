@@ -29,7 +29,7 @@ const PreviousYearPapers = () => {
   const {user} = useUserContext()
   useEffect(()=>{
     if(user.access === "limited") {
-      router.push(`/syllabus/subject/paper/${user.subjectId}/${user.subjectName}`)
+      router.push(`/pyqs/subject/paper/${user.subjectId}/${user.subjectName}`)
     }
   }, [user, router])
 
