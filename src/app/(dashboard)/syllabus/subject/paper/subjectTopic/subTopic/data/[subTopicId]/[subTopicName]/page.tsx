@@ -415,24 +415,6 @@ const CreateQuestionDialog = ({
       console.log(error);
     } finally {
       setLoading(false);
-      setQuesText("");
-      setQuesTextHindi("");
-      setOp1("");
-      setOp2("");
-      setOp3("");
-      setOp4("");
-      setOp1Hindi("");
-      setOp2Hindi("");
-      setOp3Hindi("");
-      setOp4Hindi("");
-      setCorrectOp(null);
-      setExplanation("");
-      setExplanationHindi("");
-      setLink("");
-      setLinkHindi("");
-      setRefTitle("");
-      setRefTitleHindi("");
-      setSelectedTags([]);
       fetchQues();
     }
   };
