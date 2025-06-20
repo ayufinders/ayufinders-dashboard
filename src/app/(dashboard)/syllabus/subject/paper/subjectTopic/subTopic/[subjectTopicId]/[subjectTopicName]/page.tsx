@@ -144,7 +144,7 @@ const SubTopicList = ({
               <Button
                 onClick={() => {
                   router.push(
-                    `/syllabus/subject/paper/subjectTopic/subTopic/data/${sub._id}/${sub.name}`
+                    `/syllabus/subject/paper/subjectTopic/subTopic/data/${sub._id}/${encodeURIComponent(sub.name)}`
                   );
                 }}
                 className="flex items-center gap-2 bg-gradient-to-b from-gray-600 to-gray-900 hover:scale-105 transition-all duration-300"
