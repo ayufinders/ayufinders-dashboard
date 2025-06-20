@@ -419,6 +419,29 @@ const CreateQuestionDialog = ({
     }
   };
 
+  const handleClearData = () => {
+    setQuesText("");
+    setOp1("");
+    setOp2("");
+    setOp3("");
+    setOp4("");
+    setCorrectOp(null);
+    setExplanation("");
+    setRefTitle("");
+    setLink("");
+
+    setQuesTextHindi("");
+    setOp1Hindi("");
+    setOp2Hindi("");
+    setOp3Hindi("");
+    setOp4Hindi("");
+    setExplanationHindi("");
+    setRefTitleHindi("");
+    setLinkHindi("");
+
+    setSelectedTags([]);
+  }
+
   const handleToggle = (value: string) => {
     console.log(value)
     setCorrectOp(Number(value));
@@ -565,6 +588,9 @@ const CreateQuestionDialog = ({
               Close
             </Button>
           </DialogClose>
+          <Button type="button" onClick={handleClearData} variant="outline">
+              Clear Data
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
