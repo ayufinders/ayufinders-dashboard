@@ -500,16 +500,16 @@ const CreateQuestionDialog = ({
             </Label>
 
             <ToggleGroup type="single" onValueChange={handleToggle}>
-              <ToggleGroupItem value="1" aria-label="Toggle 1">
+              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="1" aria-label="Toggle 1">
                 1
               </ToggleGroupItem>
-              <ToggleGroupItem value="2" aria-label="Toggle 2">
+              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="2" aria-label="Toggle 2">
                 2
               </ToggleGroupItem>
-              <ToggleGroupItem value="3" aria-label="Toggle 3">
+              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="3" aria-label="Toggle 3">
                 3
               </ToggleGroupItem>
-              <ToggleGroupItem value="4" aria-label="Toggle 4">
+              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="4" aria-label="Toggle 4">
                 4
               </ToggleGroupItem>
             </ToggleGroup>
