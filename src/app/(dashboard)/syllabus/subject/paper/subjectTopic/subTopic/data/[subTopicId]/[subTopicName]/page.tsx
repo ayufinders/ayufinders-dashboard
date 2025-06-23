@@ -982,7 +982,7 @@ const UpdateQuestionDialog = ({
             },
           ],
           correctOption: correctOp
-            ? (correctOp as number) - 1
+            ? (correctOp as number)
             : question.correctOption,
           explanation: explanation,
           explanationHindi: explanationHindi,
