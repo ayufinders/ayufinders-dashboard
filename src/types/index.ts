@@ -118,3 +118,17 @@ export interface QuestionPaperType {
   key: string;
   university: UniversityType
 };
+
+export interface BookType {
+  _id: string;
+  name: string;
+  description: string;
+  createdBy: AdminType;
+}
+
+export interface BookSectionType {
+  _id: string;
+  name: string;
+  description: string;
+  createdBy: AdminType;
+}
