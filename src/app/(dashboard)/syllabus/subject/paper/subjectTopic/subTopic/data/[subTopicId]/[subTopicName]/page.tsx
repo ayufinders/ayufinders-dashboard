@@ -44,7 +44,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { QuestionType, DocType, VideoType, FileUpload, TagType } from "@/types";
+import { QuestionType, DocType, VideoType, FileUpload, TagType, BookType, BookSectionType } from "@/types";
 import { ToggleGroup } from "@radix-ui/react-toggle-group";
 import { ToggleGroupItem } from "@/components/ui/toggle-group";
 import TagsMenu from "@/components/TagsMenu";
@@ -634,6 +634,62 @@ const QuestionForm = ({
   setRefTitle: (x: string) => void;
   setLink: (x: string) => void;
 }) => {
+
+  const [books, setBooks] = useState<BookType[]>([]);
+  const [sections, setSections] = useState<BookSectionType[]>([]);
+
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [chapter, setChapter] = useState<string>("");
+  const [shloka, setShloka] = useState<string>("");
+
+  useEffect(()=>{
+    const fetchBooks = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/books`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+        setBooks(response.data.data);
+      } catch (error) {
+        console.log("Error fetching books:", error);
+      }
+    };
+
+    const fetchSections = async (bookId: string) => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/bookSections/book/${bookId}`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+        setSections(response.data.data);
+      } catch (error) {
+        console.log("Error fetching sections:", error);
+      }
+    };
+
+    fetchBooks();
+    fetchSections(selectedBookId || '');
+  }, [selectedBookId]);
+  
+
+  useEffect(()=>{
+    const bookName = books.find((book) => book._id === selectedBookId)?.name || "";
+    const sectionName = sections.find((section) => section._id === selectedSectionId)?.name || "";
+    const ref = `${bookName} - ${sectionName} - ${chapter} - ${shloka}`;
+    setRefTitle(ref);
+  }, [selectedSectionId, selectedBookId, chapter, shloka, setRefTitle, books, sections]);
+
   return (
     <div className="flex flex-col gap-2 w-full p-4 border">
       <div className="grid grid-cols-5 items-center gap-4">
@@ -721,6 +777,66 @@ const QuestionForm = ({
         <Label htmlFor="reference-title" className="text-center">
           Reference <span className="text-xs text-gray-500">Optional</span>
         </Label>
+        <div className="col-span-4 flex flex-row gap-2 items-center">
+          <Select value={selectedBookId || ""} onValueChange={(value) => {
+            setSelectedBookId(value);
+          }}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Book" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {books.map((book) => (
+                  <SelectItem
+                    key={book._id}
+                    value={book._id}
+                  >
+                    {book.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedSectionId || ""} onValueChange={(value) => {
+            setSelectedSectionId(value);
+          }}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Section" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {sections.map((section) => (
+                  <SelectItem
+                    key={section._id}
+                    value={section._id}
+                  >
+                    {section.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          <Input
+            placeholder="Chapter"
+            value={chapter}
+            onChange={(e) => {
+              setChapter(e.target.value);
+            }}
+            className="w-full"
+          />
+
+          <Input
+            placeholder="Shloka"
+            value={shloka}
+            onChange={(e) => {
+              setShloka(e.target.value);
+            }}
+            className="w-full"
+          />
+
+        </div>
         <Input
           id="reference-title"
           className="col-span-4"
@@ -784,6 +900,63 @@ const QuestionFormHindi = ({
   setRefTitle: (x: string) => void;
   setLink: (x: string) => void;
 }) => {
+
+const [books, setBooks] = useState<BookType[]>([]);
+  const [sections, setSections] = useState<BookSectionType[]>([]);
+
+  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [chapter, setChapter] = useState<string>("");
+  const [shloka, setShloka] = useState<string>("");
+
+  useEffect(()=>{
+    const fetchBooks = async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/books`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+        setBooks(response.data.data);
+      } catch (error) {
+        console.log("Error fetching books:", error);
+      }
+    };
+
+    const fetchSections = async (bookId: string) => {
+      try {
+        const response = await axios.get(
+          `${process.env.NEXT_PUBLIC_BASE_URL}/bookSections/book/${bookId}`,
+          {
+            withCredentials: true,
+            headers: {
+              Authorization: "Bearer " + localStorage.getItem("token"),
+            },
+          }
+        );
+        setSections(response.data.data);
+      } catch (error) {
+        console.log("Error fetching sections:", error);
+      }
+    };
+
+    fetchBooks();
+    fetchSections(selectedBookId || '');
+  }, [selectedBookId]);
+  
+
+  useEffect(()=>{
+    const bookName = books.find((book) => book._id === selectedBookId)?.name || "";
+    const sectionName = sections.find((section) => section._id === selectedSectionId)?.name || "";
+    const ref = `${bookName} - ${sectionName} - ${chapter} - ${shloka}`;
+    setRefTitle(ref);
+  }, [selectedSectionId, selectedBookId, chapter, shloka, setRefTitle, books, sections]);
+
+
   return (
     <div className="flex flex-col gap-2 w-full p-4 border">
       <div className="grid grid-cols-5 items-center gap-4">
@@ -871,6 +1044,66 @@ const QuestionFormHindi = ({
         <Label htmlFor="reference-title" className="text-center">
           Reference <span className="text-xs text-gray-500">Optional</span>
         </Label>
+        <div className="col-span-4 flex flex-row gap-2 items-center">
+          <Select value={selectedBookId || ""} onValueChange={(value) => {
+            setSelectedBookId(value);
+          }}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Book" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {books.map((book) => (
+                  <SelectItem
+                    key={book._id}
+                    value={book._id}
+                  >
+                    {book.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          <Select value={selectedSectionId || ""} onValueChange={(value) => {
+            setSelectedSectionId(value);
+          }}>
+            <SelectTrigger className="w-full">
+              <SelectValue placeholder="Section" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                {sections.map((section) => (
+                  <SelectItem
+                    key={section._id}
+                    value={section._id}
+                  >
+                    {section.name}
+                  </SelectItem>
+                ))}
+              </SelectGroup>
+            </SelectContent>
+          </Select>
+
+          <Input
+            placeholder="Chapter"
+            value={chapter}
+            onChange={(e) => {
+              setChapter(e.target.value);
+            }}
+            className="w-full"
+          />
+
+          <Input
+            placeholder="Shloka"
+            value={shloka}
+            onChange={(e) => {
+              setShloka(e.target.value);
+            }}
+            className="w-full"
+          />
+
+        </div>
         <Input
           id="reference-title"
           className="col-span-4"

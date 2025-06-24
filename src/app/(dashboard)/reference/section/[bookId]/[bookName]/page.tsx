@@ -42,7 +42,7 @@ const BookSection = () => {
   const fetchSections = async () => {
     try {
       const response = await axios.get(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/bookSections`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/bookSections/book/${bookId}`,
         {
           withCredentials: true,
           headers: {
