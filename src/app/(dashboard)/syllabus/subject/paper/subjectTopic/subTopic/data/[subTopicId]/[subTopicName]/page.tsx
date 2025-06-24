@@ -247,7 +247,7 @@ const DeleteModalButton = ({
 
   const deleteTopicHandler = async (quesId: string) => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/quiz/${quesId}`, {
+      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/question/${quesId}`, {
         withCredentials: true,
         headers: {
           'Authorization': 'Bearer ' + localStorage.getItem("token")
