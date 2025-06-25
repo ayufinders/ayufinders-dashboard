@@ -1182,7 +1182,7 @@ const UpdateQuestionDialog = ({
         });
       }
       await axios.put(
-        `${process.env.NEXT_PUBLIC_BASE_URL}/quiz/question/${question._id}`,
+        `${process.env.NEXT_PUBLIC_BASE_URL}/question/${question._id}`,
         {
           text: quesText,
           textHindi: quesTextHindi,
