@@ -688,7 +688,8 @@ const QuestionForm = ({
     const sectionName = sections.find((section) => section._id === selectedSectionId)?.name || "";
     const ref = `${bookName} - ${sectionName} - ${chapter} - ${shloka}`;
     setRefTitle(ref);
-  }, [selectedSectionId, selectedBookId, chapter, shloka, setRefTitle, books, sections]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedSectionId, selectedBookId, chapter, shloka, books, sections]);
 
   return (
     <div className="flex flex-col gap-2 w-full p-4 border">
