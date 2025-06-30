@@ -60,7 +60,7 @@ const BookSection = () => {
 
   useEffect(() => {
     const filteredSections = sections.filter((section) =>
-      section.name.toLowerCase().includes(search.toLowerCase())
+      section.nameEng.toLowerCase().includes(search.toLowerCase())
     );
     setFilteredSections(filteredSections);
   }, [search, sections]);
@@ -126,7 +126,7 @@ const BookSectionsList = ({
         {sections.map((section: BookSectionType, index: number) => (
           <TableRow key={index} className="cursor-pointer hover:bg-gray-50">
             <TableCell className="font-medium">{index + 1}</TableCell>
-            <TableCell className="font-semibold">{section.name}</TableCell>
+            <TableCell className="font-semibold">{section.nameEng}/{section.nameHindi}</TableCell>
             <TableCell>{section.description}</TableCell>
             <TableCell className="flex gap-2">
 
@@ -136,7 +136,7 @@ const BookSectionsList = ({
               />
               <DeleteModalButton
                 bookSectionId={section._id}
-                bookSectionName={section.name}
+                bookSectionName={section.nameEng}
                 fetchBookSections={fetchBookSections}
               />
             </TableCell>
@@ -154,7 +154,8 @@ const AddBookSection = ({
   fetchBookSections: () => void;
   bookId?: string;
 }) => {
-  const [bookSectionName, setBookSectionName] = useState("");
+  const [bookSectionNameEng, setBookSectionNameEng] = useState("");
+  const [bookSectionNameHindi, setBookSectionNameHindi] = useState("");
   const [bookSectionDesc, setBookSectionDesc] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -165,7 +166,8 @@ const AddBookSection = ({
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/bookSections`,
         {
-          name: bookSectionName,
+          nameEng: bookSectionNameEng,
+          nameHindi: bookSectionNameHindi,
           description: bookSectionDesc,
           bookId
         },
@@ -181,20 +183,21 @@ const AddBookSection = ({
       if (!response.data.success) {
         toast({
           title: "Book Section not created.",
-          description: `${bookSectionName} already exists.`,
+          description: `${bookSectionNameEng} already exists.`,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Book Section created.",
-          description: `${bookSectionName} has been successfully created.`,
+          description: `${bookSectionNameEng} has been successfully created.`,
         });
         fetchBookSections();
       }
     } catch (error) {
       console.error(error);
     } finally {
-      setBookSectionName("");
+      setBookSectionNameEng("");
+      setBookSectionNameHindi("");
       setBookSectionDesc("");
       setLoading(false);
     }
@@ -211,12 +214,20 @@ const AddBookSection = ({
         </DialogHeader>
         <div className="flex flex-col gap-2">
           <Input
-            value={bookSectionName}
+            value={bookSectionNameEng}
             onChange={(e) => {
-              setBookSectionName(e.target.value);
+              setBookSectionNameEng(e.target.value);
             }}
             type="text"
-            placeholder="Book Section Name"
+            placeholder="Book Section Name (English)"
+          />
+          <Input
+            value={bookSectionNameHindi}
+            onChange={(e) => {
+              setBookSectionNameHindi(e.target.value);
+            }}
+            type="text"
+            placeholder="Book Section Name (Hindi)"
           />
           <Textarea
             value={bookSectionDesc}
@@ -249,7 +260,8 @@ const EditBookSection = ({
   fetchBookSections: () => void;
   bookSection: BookSectionType;
 }) => {
-  const [bookSectionName, setBookSectionName] = useState(bookSection.name);
+  const [bookSectionNameEng, setBookSectionNameEng] = useState(bookSection.nameEng);
+  const [bookSectionNameHindi, setBookSectionNameHindi] = useState(bookSection.nameHindi);
   const [bookSectionDesc, setBookSectionDesc] = useState(bookSection.description);
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -260,7 +272,8 @@ const EditBookSection = ({
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_BASE_URL}/bookSections/${bookSection._id}`,
         {
-          name: bookSectionName,
+          nameEng: bookSectionNameEng,
+          nameHindi: bookSectionNameHindi,
           description: bookSectionDesc,
         },
         {
@@ -275,20 +288,21 @@ const EditBookSection = ({
       if (!response.data.success) {
         toast({
           title: "Book Section not updated.",
-          description: `${bookSectionName} does not exist.`,
+          description: `${bookSectionNameEng} does not exist.`,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Book Section updated.",
-          description: `${bookSectionName} has been successfully updated.`,
+          description: `${bookSectionNameEng} has been successfully updated.`,
         });
         fetchBookSections();
       }
     } catch (error) {
       console.error(error);
     } finally {
-      setBookSectionName("");
+      setBookSectionNameEng("");
+      setBookSectionNameHindi("");
       setBookSectionDesc("");
       setLoading(false);
     }
@@ -306,9 +320,17 @@ const EditBookSection = ({
         </DialogHeader>
         <div className="flex flex-col gap-2">
           <Input
-            defaultValue={bookSectionName}
+            defaultValue={bookSectionNameEng}
             onChange={(e) => {
-              setBookSectionName(e.target.value);
+              setBookSectionNameEng(e.target.value);
+            }}
+            type="text"
+            placeholder="Book Section Name"
+          />
+          <Input
+            defaultValue={bookSectionNameHindi}
+            onChange={(e) => {
+              setBookSectionNameHindi(e.target.value);
             }}
             type="text"
             placeholder="Book Section Name"

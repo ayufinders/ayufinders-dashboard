@@ -57,7 +57,7 @@ const Books = () => {
 
   useEffect(() => {
     const filteredBooks = books.filter((book) =>
-      book.name.toLowerCase().includes(search.toLowerCase())
+      book.nameEng.toLowerCase().includes(search.toLowerCase())
     );
     setFilteredBooks(filteredBooks);
   }, [search, books]);
@@ -124,12 +124,12 @@ const BooksList = ({
         {books.map((book: BookType, index: number) => (
           <TableRow key={index} className="cursor-pointer hover:bg-gray-50">
             <TableCell className="font-medium">{index + 1}</TableCell>
-            <TableCell className="font-semibold">{book.name}</TableCell>
+            <TableCell className="font-semibold">{book.nameEng}/{book.nameHindi}</TableCell>
             <TableCell>{book.description}</TableCell>
             <TableCell className="flex gap-2">
               <Button
                 onClick={() => {
-                  router.push(`/reference/section/${book._id}/${encodeURIComponent(book.name)}`);
+                  router.push(`/reference/section/${book._id}/${encodeURIComponent(book.nameEng)}`);
                 }}
                 className="bg-gradient-to-b from-gray-600 to-gray-900 rounded-md shadow-sm p-2 px-4 text-sm hover:scale-105 duration-300 transition-all"
               >
@@ -141,7 +141,7 @@ const BooksList = ({
               />
               <DeleteModalButton
                 bookId={book._id}
-                bookName={book.name}
+                bookName={book.nameEng}
                 fetchBooks={fetchBooks}
               />
             </TableCell>
@@ -157,7 +157,8 @@ const AddBook = ({
 }: {
   fetchBooks: () => void;
 }) => {
-  const [bookName, setBookName] = useState("");
+  const [bookNameEng, setBookNameEng] = useState("");
+  const [bookNameHindi, setBookNameHindi] = useState("");
   const [bookDesc, setBookDesc] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -168,7 +169,8 @@ const AddBook = ({
       const response = await axios.post(
         `${process.env.NEXT_PUBLIC_BASE_URL}/books`,
         {
-          name: bookName,
+          nameEng: bookNameEng,
+          nameHindi: bookNameHindi,
           description: bookDesc,
         },
         {
@@ -183,20 +185,21 @@ const AddBook = ({
       if (!response.data.success) {
         toast({
           title: "Book not created.",
-          description: `${bookName} already exists.`,
+          description: `${bookNameEng} already exists.`,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Book created.",
-          description: `${bookName} has been successfully created.`,
+          description: `${bookNameEng} has been successfully created.`,
         });
         fetchBooks();
       }
     } catch (error) {
       console.error(error);
     } finally {
-      setBookName("");
+      setBookNameEng("");
+      setBookNameHindi("");
       setBookDesc("");
       setLoading(false);
     }
@@ -213,12 +216,20 @@ const AddBook = ({
         </DialogHeader>
         <div className="flex flex-col gap-2">
           <Input
-            value={bookName}
+            value={bookNameEng}
             onChange={(e) => {
-              setBookName(e.target.value);
+              setBookNameEng(e.target.value);
             }}
             type="text"
-            placeholder="Book Name"
+            placeholder="Book Name (English)"
+          />
+          <Input
+            value={bookNameHindi}
+            onChange={(e) => {
+              setBookNameHindi(e.target.value);
+            }}
+            type="text"
+            placeholder="Book Name (Hindi)"
           />
           <Textarea
             value={bookDesc}
@@ -251,7 +262,8 @@ const EditBook = ({
   fetchBooks: () => void;
   book: BookType;
 }) => {
-  const [bookName, setBookName] = useState(book.name);
+  const [bookNameEng, setBookNameEng] = useState(book.nameEng);
+  const [bookNameHindi, setBookNameHindi] = useState(book.nameHindi);
   const [bookDesc, setBookDesc] = useState(book.description);
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -262,7 +274,8 @@ const EditBook = ({
       const response = await axios.put(
         `${process.env.NEXT_PUBLIC_BASE_URL}/books/${book._id}`,
         {
-          name: bookName,
+          nameEng: bookNameEng,
+          nameHindi: bookNameHindi,
           description: bookDesc,        
         },
         {
@@ -277,20 +290,21 @@ const EditBook = ({
       if (!response.data.success) {
         toast({
           title: "Book not updated.",
-          description: `${bookName} does not exist.`,
+          description: `${bookNameEng} does not exist.`,
           variant: "destructive",
         });
       } else {
         toast({
           title: "Book updated.",
-          description: `${bookName} has been successfully updated.`,
+          description: `${bookNameEng} has been successfully updated.`,
         });
         fetchBooks();
       }
     } catch (error) {
       console.error(error);
     } finally {
-      setBookName("");
+      setBookNameEng("");
+      setBookNameHindi("");
       setBookDesc("");
       setLoading(false);
     }
@@ -308,12 +322,20 @@ const EditBook = ({
         </DialogHeader>
         <div className="flex flex-col gap-2">
           <Input
-            defaultValue={bookName}
+            defaultValue={bookNameEng}
             onChange={(e) => {
-              setBookName(e.target.value);
+              setBookNameEng(e.target.value);
             }}
             type="text"
-            placeholder="Book Name"
+            placeholder="Book Name (English)"
+          />
+          <Input
+            defaultValue={bookNameHindi}
+            onChange={(e) => {
+              setBookNameHindi(e.target.value);
+            }}
+            type="text"
+            placeholder="Book Name (Hindi)"
           />
           <Textarea
             defaultValue={bookDesc}

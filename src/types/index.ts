@@ -17,6 +17,8 @@ export interface QuestionType {
   };
   categoryId: string;
   tagId: TagType[];
+  bookId: string;
+  sectionId: string;
   createdBy: AdminType;
 };
 
@@ -121,14 +123,16 @@ export interface QuestionPaperType {
 
 export interface BookType {
   _id: string;
-  name: string;
+  nameEng: string;
+  nameHindi: string;
   description: string;
   createdBy: AdminType;
 }
 
 export interface BookSectionType {
   _id: string;
-  name: string;
+  nameEng: string;
+  nameHindi: string;
   description: string;
   createdBy: AdminType;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import {
   Table,
@@ -44,7 +44,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { QuestionType, DocType, VideoType, FileUpload, TagType, BookType, BookSectionType } from "@/types";
+import {
+  QuestionType,
+  DocType,
+  VideoType,
+  FileUpload,
+  TagType,
+  BookType,
+  BookSectionType,
+} from "@/types";
 import { ToggleGroup } from "@radix-ui/react-toggle-group";
 import { ToggleGroupItem } from "@/components/ui/toggle-group";
 import TagsMenu from "@/components/TagsMenu";
@@ -129,11 +137,17 @@ const SubTopicData = () => {
           <AccordionItem value="item-1">
             <AccordionTrigger className="font-bold text-gray-600 text-lg no-underline hover:no-underline">
               MCQ Questions
-          </AccordionTrigger>
-          <AccordionContent className="border p-4 place-items-end">
-              <CreateQuestionDialog subTopicId={subTopicId as string} fetchQues={fetchData}/>
-              <QuestionsList fetchQuestions={fetchData} questions={filteredMcqQuestions}/>
-          </AccordionContent>
+            </AccordionTrigger>
+            <AccordionContent className="border p-4 place-items-end">
+              <CreateQuestionDialog
+                subTopicId={subTopicId as string}
+                fetchQues={fetchData}
+              />
+              <QuestionsList
+                fetchQuestions={fetchData}
+                questions={filteredMcqQuestions}
+              />
+            </AccordionContent>
           </AccordionItem>
           <AccordionItem value="item-2">
             <AccordionTrigger className="font-bold text-gray-600 text-lg no-underline hover:no-underline">
@@ -161,8 +175,6 @@ const SubTopicData = () => {
               </div>
             </AccordionContent>
           </AccordionItem>
-
-          
         </Accordion>
       </div>
     </main>
@@ -247,12 +259,15 @@ const DeleteModalButton = ({
 
   const deleteTopicHandler = async (quesId: string) => {
     try {
-      await axios.delete(`${process.env.NEXT_PUBLIC_BASE_URL}/question/${quesId}`, {
-        withCredentials: true,
-        headers: {
-          'Authorization': 'Bearer ' + localStorage.getItem("token")
+      await axios.delete(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/question/${quesId}`,
+        {
+          withCredentials: true,
+          headers: {
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
-      });
+      );
       toast({
         title: "Question deleted.",
       });
@@ -303,15 +318,14 @@ const DeleteModalButton = ({
 
 const CreateQuestionDialog = ({
   fetchQues,
-  subTopicId
+  subTopicId,
 }: {
   fetchQues: () => void;
-  subTopicId: string
+  subTopicId: string;
 }) => {
   const [loading, setLoading] = useState(false);
   const [selectedTags, setSelectedTags] = useState<TagType[]>([]);
-  const {user} = useUserContext();
-
+  const { user } = useUserContext();
 
   const [quesText, setQuesText] = useState("");
   const [op1, setOp1] = useState("");
@@ -331,6 +345,8 @@ const CreateQuestionDialog = ({
   const [explanationHindi, setExplanationHindi] = useState("");
   const [refTitleHindi, setRefTitleHindi] = useState("");
   const [linkHindi, setLinkHindi] = useState("");
+  const [bookId, setBookId] = useState("");
+  const [sectionId, setSectionId] = useState("");
 
   const { toast } = useToast();
 
@@ -382,7 +398,7 @@ const CreateQuestionDialog = ({
               text: op4Hindi,
             },
           ],
-          correctOption: (correctOp as number),
+          correctOption: correctOp as number,
           explanation: explanation,
           explanationHindi: explanationHindi,
           reference: {
@@ -396,12 +412,14 @@ const CreateQuestionDialog = ({
           tagId: selectedTags,
           createdBy: user.id,
           subjectId: user.subjectId,
-          subTopicId: subTopicId
+          subTopicId: subTopicId,
+          bookId,
+          sectionId,
         },
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -440,10 +458,10 @@ const CreateQuestionDialog = ({
     setLinkHindi("");
 
     setSelectedTags([]);
-  }
+  };
 
   const handleToggle = (value: string) => {
-    console.log(value)
+    console.log(value);
     setCorrectOp(Number(value));
   };
 
@@ -454,7 +472,7 @@ const CreateQuestionDialog = ({
           Create Question
         </Button>
       </DialogTrigger>
-      <DialogContent className="md:min-w-[90vw]">
+      <DialogContent className="md:min-w-[90vw] md:max-h-[80vh] overflow-scroll">
         <DialogHeader>
           <DialogTitle>Create Question</DialogTitle>
           <DialogDescription>
@@ -467,6 +485,7 @@ const CreateQuestionDialog = ({
               English
             </div>
             <QuestionForm
+              type="create"
               quesText={quesText}
               op1={op1}
               op2={op2}
@@ -475,6 +494,8 @@ const CreateQuestionDialog = ({
               explanation={explanation}
               refTitle={refTitle}
               link={link}
+              bookId={bookId}
+              sectionId={sectionId}
               setQuesText={setQuesText}
               setOp1={setOp1}
               setOp2={setOp2}
@@ -485,6 +506,8 @@ const CreateQuestionDialog = ({
               setLink={setLink}
               fetchQues={fetchQues}
               setLoading={setLoading}
+              setBookId={setBookId}
+              setSectionId={setSectionId}
             />
           </div>
 
@@ -493,6 +516,7 @@ const CreateQuestionDialog = ({
               Hindi
             </div>
             <QuestionFormHindi
+              type="create"
               quesText={quesTextHindi}
               op1={op1Hindi}
               op2={op2Hindi}
@@ -523,16 +547,32 @@ const CreateQuestionDialog = ({
             </Label>
 
             <ToggleGroup type="single" onValueChange={handleToggle}>
-              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="1" aria-label="Toggle 1">
+              <ToggleGroupItem
+                className="data-[state=on]:bg-black data-[state=on]:text-white"
+                value="1"
+                aria-label="Toggle 1"
+              >
                 1
               </ToggleGroupItem>
-              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="2" aria-label="Toggle 2">
+              <ToggleGroupItem
+                className="data-[state=on]:bg-black data-[state=on]:text-white"
+                value="2"
+                aria-label="Toggle 2"
+              >
                 2
               </ToggleGroupItem>
-              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="3" aria-label="Toggle 3">
+              <ToggleGroupItem
+                className="data-[state=on]:bg-black data-[state=on]:text-white"
+                value="3"
+                aria-label="Toggle 3"
+              >
                 3
               </ToggleGroupItem>
-              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="4" aria-label="Toggle 4">
+              <ToggleGroupItem
+                className="data-[state=on]:bg-black data-[state=on]:text-white"
+                value="4"
+                aria-label="Toggle 4"
+              >
                 4
               </ToggleGroupItem>
             </ToggleGroup>
@@ -543,7 +583,7 @@ const CreateQuestionDialog = ({
             <Label htmlFor="tags" className="text-center grid-cols-1">
               Tags
             </Label>
-            
+
             <div className="w-full flex flex-row gap-2 items-center">
               <TagsMenu
                 questionTags={[]}
@@ -589,7 +629,7 @@ const CreateQuestionDialog = ({
             </Button>
           </DialogClose>
           <Button type="button" onClick={handleClearData} variant="outline">
-              Clear Data
+            Clear Data
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -598,14 +638,17 @@ const CreateQuestionDialog = ({
 };
 
 const QuestionForm = ({
+  type,
   quesText,
   op1,
   op2,
   op3,
   op4,
   explanation,
-  refTitle,
   link,
+  bookId,
+  sectionId,
+  refTitle,
   setQuesText,
   setOp1,
   setOp2,
@@ -614,7 +657,10 @@ const QuestionForm = ({
   setExplanation,
   setRefTitle,
   setLink,
+  setBookId,
+  setSectionId,
 }: {
+  type: 'create'|'update',
   quesText: string;
   op1: string;
   op2: string;
@@ -623,6 +669,8 @@ const QuestionForm = ({
   explanation: string;
   refTitle: string;
   link: string;
+  bookId?: string | null;
+  sectionId?: string | null;
   fetchQues: () => void;
   setLoading: (x: boolean) => void;
   setQuesText: (x: string) => void;
@@ -633,17 +681,25 @@ const QuestionForm = ({
   setExplanation: (x: string) => void;
   setRefTitle: (x: string) => void;
   setLink: (x: string) => void;
+  setBookId: (x: string) => void;
+  setSectionId: (x: string) => void;
 }) => {
-
   const [books, setBooks] = useState<BookType[]>([]);
   const [sections, setSections] = useState<BookSectionType[]>([]);
 
-  const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
-  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [selectedBookId, setSelectedBookId] = useState<string | null | undefined>(bookId);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null | undefined>(
+    sectionId
+  );
   const [chapter, setChapter] = useState<string>("");
   const [shloka, setShloka] = useState<string>("");
 
-  useEffect(()=>{
+  const visibleRef = useMemo(()=>{
+    return refTitle;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
     const fetchBooks = async () => {
       try {
         const response = await axios.get(
@@ -679,17 +735,29 @@ const QuestionForm = ({
     };
 
     fetchBooks();
-    fetchSections(selectedBookId || '');
+    fetchSections(selectedBookId || "");
   }, [selectedBookId]);
-  
 
-  useEffect(()=>{
-    const bookName = books.find((book) => book._id === selectedBookId)?.name || "";
-    const sectionName = sections.find((section) => section._id === selectedSectionId)?.name || "";
+  useEffect(() => {
+    setSelectedBookId(bookId as string);
+    setSelectedSectionId(sectionId as string);
+  }, [bookId, sectionId]);
+
+  useEffect(() => {
+    const bookName =
+      books.find((book) => book._id === selectedBookId)?.nameEng || "";
+    const sectionName =
+      sections.find((section) => section._id === selectedSectionId)?.nameEng ||
+      "";
+    if (!bookName || !sectionName) return;
     const ref = `${bookName} - ${sectionName} - ${chapter} - ${shloka}`;
+
     setRefTitle(ref);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedSectionId, selectedBookId, chapter, shloka, books, sections]);
+
+    if (selectedBookId != null) setBookId(selectedBookId);
+    if (selectedSectionId != null) setSectionId(selectedSectionId);
+
+  }, [selectedSectionId, selectedBookId, chapter, shloka, books, sections, setBookId, setSectionId, setRefTitle, bookId]);
 
   return (
     <div className="flex flex-col gap-2 w-full p-4 border">
@@ -778,41 +846,43 @@ const QuestionForm = ({
         <Label htmlFor="reference-title" className="text-center">
           Reference <span className="text-xs text-gray-500">Optional</span>
         </Label>
+        {type==='update' && <div className="col-span-4 border p-2 rounded text-sm"><p>Current: {visibleRef}</p></div>}
+        <div className="col-span-4 border p-2 rounded text-sm"><p>New: {refTitle}</p></div>
         <div className="col-span-4 flex flex-row gap-2 items-center">
-          <Select value={selectedBookId || ""} onValueChange={(value) => {
-            setSelectedBookId(value);
-          }}>
+          <Select
+            value={(selectedBookId as string) || ""}
+            onValueChange={(value) => {
+              setSelectedBookId(value);
+            }}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Book" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {books.map((book) => (
-                  <SelectItem
-                    key={book._id}
-                    value={book._id}
-                  >
-                    {book.name}
+                  <SelectItem key={book._id} value={book._id}>
+                    {book.nameEng}
                   </SelectItem>
                 ))}
               </SelectGroup>
             </SelectContent>
           </Select>
 
-          <Select value={selectedSectionId || ""} onValueChange={(value) => {
-            setSelectedSectionId(value);
-          }}>
+          <Select
+            value={selectedSectionId || ""}
+            onValueChange={(value) => {
+              setSelectedSectionId(value);
+            }}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Section" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {sections.map((section) => (
-                  <SelectItem
-                    key={section._id}
-                    value={section._id}
-                  >
-                    {section.name}
+                  <SelectItem key={section._id} value={section._id}>
+                    {section.nameEng}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -836,17 +906,9 @@ const QuestionForm = ({
             }}
             className="w-full"
           />
-
         </div>
-        <Input
-          id="reference-title"
-          className="col-span-4"
-          value={refTitle}
-          onChange={(e) => {
-            setRefTitle(e.target.value);
-          }}
-        />
       </div>
+      
       <div className="grid grid-cols-5 items-center gap-4">
         <Label htmlFor="reference-link" className="text-center">
           Link <span className="text-xs block text-gray-500">Optional</span>
@@ -865,14 +927,15 @@ const QuestionForm = ({
 };
 
 const QuestionFormHindi = ({
+  type,
   quesText,
   op1,
   op2,
   op3,
   op4,
   explanation,
-  refTitle,
   link,
+  refTitle,
   setQuesText,
   setOp1,
   setOp2,
@@ -882,6 +945,7 @@ const QuestionFormHindi = ({
   setRefTitle,
   setLink,
 }: {
+  type: 'create'|'update',
   quesText: string;
   op1: string;
   op2: string;
@@ -901,16 +965,22 @@ const QuestionFormHindi = ({
   setRefTitle: (x: string) => void;
   setLink: (x: string) => void;
 }) => {
-
-const [books, setBooks] = useState<BookType[]>([]);
+  const [books, setBooks] = useState<BookType[]>([]);
   const [sections, setSections] = useState<BookSectionType[]>([]);
 
   const [selectedBookId, setSelectedBookId] = useState<string | null>(null);
-  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(null);
+  const [selectedSectionId, setSelectedSectionId] = useState<string | null>(
+    null
+  );
   const [chapter, setChapter] = useState<string>("");
   const [shloka, setShloka] = useState<string>("");
 
-  useEffect(()=>{
+  const visibleRef = useMemo(()=>{
+    return refTitle;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
     const fetchBooks = async () => {
       try {
         const response = await axios.get(
@@ -946,17 +1016,28 @@ const [books, setBooks] = useState<BookType[]>([]);
     };
 
     fetchBooks();
-    fetchSections(selectedBookId || '');
+    fetchSections(selectedBookId || "");
   }, [selectedBookId]);
-  
 
-  useEffect(()=>{
-    const bookName = books.find((book) => book._id === selectedBookId)?.name || "";
-    const sectionName = sections.find((section) => section._id === selectedSectionId)?.name || "";
+  useEffect(() => {
+    const bookName =
+      books.find((book) => book._id === selectedBookId)?.nameHindi || "";
+    const sectionName =
+      sections.find((section) => section._id === selectedSectionId)
+        ?.nameHindi || "";
+    if(!bookName || !sectionName) return;
     const ref = `${bookName} - ${sectionName} - ${chapter} - ${shloka}`;
     setRefTitle(ref);
-  }, [selectedSectionId, selectedBookId, chapter, shloka, setRefTitle, books, sections]);
-
+  }, [
+    selectedSectionId,
+    selectedBookId,
+    chapter,
+    shloka,
+    setRefTitle,
+    books,
+    sections,
+  ]);
+  
 
   return (
     <div className="flex flex-col gap-2 w-full p-4 border">
@@ -1045,41 +1126,43 @@ const [books, setBooks] = useState<BookType[]>([]);
         <Label htmlFor="reference-title" className="text-center">
           Reference <span className="text-xs text-gray-500">Optional</span>
         </Label>
+        {type==='update' && <div className="col-span-4 border p-2 rounded text-sm"><p>Current: {visibleRef}</p></div>}
+        <div className="col-span-4 border p-2 rounded text-sm"><p>New: {refTitle}</p></div>
         <div className="col-span-4 flex flex-row gap-2 items-center">
-          <Select value={selectedBookId || ""} onValueChange={(value) => {
-            setSelectedBookId(value);
-          }}>
+          <Select
+            value={selectedBookId || ""}
+            onValueChange={(value) => {
+              setSelectedBookId(value);
+            }}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Book" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {books.map((book) => (
-                  <SelectItem
-                    key={book._id}
-                    value={book._id}
-                  >
-                    {book.name}
+                  <SelectItem key={book._id} value={book._id}>
+                    {book.nameHindi}
                   </SelectItem>
                 ))}
               </SelectGroup>
             </SelectContent>
           </Select>
 
-          <Select value={selectedSectionId || ""} onValueChange={(value) => {
-            setSelectedSectionId(value);
-          }}>
+          <Select
+            value={selectedSectionId || ""}
+            onValueChange={(value) => {
+              setSelectedSectionId(value);
+            }}
+          >
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Section" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
                 {sections.map((section) => (
-                  <SelectItem
-                    key={section._id}
-                    value={section._id}
-                  >
-                    {section.name}
+                  <SelectItem key={section._id} value={section._id}>
+                    {section.nameHindi}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -1103,16 +1186,7 @@ const [books, setBooks] = useState<BookType[]>([]);
             }}
             className="w-full"
           />
-
         </div>
-        <Input
-          id="reference-title"
-          className="col-span-4"
-          value={refTitle}
-          onChange={(e) => {
-            setRefTitle(e.target.value);
-          }}
-        />
       </div>
       <div className="grid grid-cols-5 items-center gap-4">
         <Label htmlFor="reference-link" className="text-center">
@@ -1163,10 +1237,11 @@ const UpdateQuestionDialog = ({
     question.referenceHindi?.title
   );
   const [linkHindi, setLinkHindi] = useState(question.referenceHindi?.link);
+  const [bookId, setBookId] = useState(question.bookId);
+  const [sectionId, setSectionId] = useState(question.sectionId);
 
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-
 
   const removeTag = (id: string) => {
     const updatedTags = selectedTags.filter((tag) => tag._id != id);
@@ -1224,16 +1299,18 @@ const UpdateQuestionDialog = ({
             title: refTitle,
             link: link,
           },
-          referencHindi: {
+          referenceHindi: {
             title: refTitleHindi,
             link: linkHindi,
           },
           tagId: selectedTags,
+          bookId,
+          sectionId,
         },
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -1262,12 +1339,10 @@ const UpdateQuestionDialog = ({
           Edit <ChevronRight size={20} />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[90vw]">
+      <DialogContent className="md:min-w-[90vw] md:max-h-[80vh] overflow-scroll">
         <DialogHeader>
           <DialogTitle>Edit Question</DialogTitle>
-          <DialogDescription className="">
-              Update question
-          </DialogDescription>
+          <DialogDescription className="">Update question</DialogDescription>
         </DialogHeader>
         <div className="flex flex-row gap-4 justify-evenly w-full">
           <div className="w-full">
@@ -1275,6 +1350,7 @@ const UpdateQuestionDialog = ({
               English
             </div>
             <QuestionForm
+              type="update"
               quesText={quesText}
               op1={op1}
               op2={op2}
@@ -1293,6 +1369,8 @@ const UpdateQuestionDialog = ({
               setLink={setLink}
               fetchQues={fetchQues}
               setLoading={setLoading}
+              setBookId={setBookId}
+              setSectionId={setSectionId}
             />
           </div>
 
@@ -1301,6 +1379,7 @@ const UpdateQuestionDialog = ({
               Hindi
             </div>
             <QuestionFormHindi
+              type="update"
               quesText={quesTextHindi}
               op1={op1Hindi}
               op2={op2Hindi}
@@ -1331,16 +1410,32 @@ const UpdateQuestionDialog = ({
             </Label>
 
             <ToggleGroup type="single" onValueChange={handleToggle}>
-              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="1" aria-label="Toggle 1">
+              <ToggleGroupItem
+                className="data-[state=on]:bg-black data-[state=on]:text-white"
+                value="1"
+                aria-label="Toggle 1"
+              >
                 1
               </ToggleGroupItem>
-              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="2" aria-label="Toggle 2">
+              <ToggleGroupItem
+                className="data-[state=on]:bg-black data-[state=on]:text-white"
+                value="2"
+                aria-label="Toggle 2"
+              >
                 2
               </ToggleGroupItem>
-              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="3" aria-label="Toggle 3">
+              <ToggleGroupItem
+                className="data-[state=on]:bg-black data-[state=on]:text-white"
+                value="3"
+                aria-label="Toggle 3"
+              >
                 3
               </ToggleGroupItem>
-              <ToggleGroupItem className="data-[state=on]:bg-black data-[state=on]:text-white" value="4" aria-label="Toggle 4">
+              <ToggleGroupItem
+                className="data-[state=on]:bg-black data-[state=on]:text-white"
+                value="4"
+                aria-label="Toggle 4"
+              >
                 4
               </ToggleGroupItem>
             </ToggleGroup>
@@ -1359,26 +1454,24 @@ const UpdateQuestionDialog = ({
                 setSelectedTags={setSelectedTags}
               />
               <div className="border rounded-md w-full flex flex-row h-12 gap-2 p-1 overflow-x-scroll">
-                {
-                  selectedTags.map((tag: TagType) => {
-                    return (
+                {selectedTags.map((tag: TagType) => {
+                  return (
+                    <div
+                      key={tag._id}
+                      className="bg-gray-100 w-fit text-nowrap p-2 text-sm flex flex-row items-center gap-4 justify-between rounded-md"
+                    >
+                      <div className="text-right">{tag.name}</div>
                       <div
-                        key={tag._id}
-                        className="bg-gray-100 w-fit text-nowrap p-2 text-sm flex flex-row items-center gap-4 justify-between rounded-md"
+                        onClick={() => {
+                          removeTag(tag._id);
+                        }}
+                        className="cursor-pointer"
                       >
-                        <div className="text-right">{tag.name}</div>
-                        <div
-                          onClick={() => {
-                            removeTag(tag._id);
-                          }}
-                          className="cursor-pointer"
-                        >
-                          x
-                        </div>
+                        x
                       </div>
-                    );
-                  })
-                }
+                    </div>
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -1467,7 +1560,6 @@ const ViewQuestionDialog = ({ question }: { question: QuestionType }) => {
     </Dialog>
   );
 };
-
 
 const UploadVideoFile = ({ fetchData }: { fetchData: () => void }) => {
   const [fileData, setFileData] = useState<FileUpload | null>(null);
@@ -1856,7 +1948,7 @@ const UploadDocFile = ({ fetchData }: { fetchData: () => void }) => {
     } finally {
       setLoading(false);
     }
-    }
+  };
 
   return (
     <Dialog>
