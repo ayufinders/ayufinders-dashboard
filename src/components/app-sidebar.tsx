@@ -1,5 +1,5 @@
 "use client"
-import { Tags, Files, Book, University, Loader, Pin } from "lucide-react"
+import { Tags, Book, University, Loader, Pin } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -28,12 +28,6 @@ export function AppSidebar() {
     title: "Tags",
     url: "tags",
     icon: Tags,
-    visible: true,
-  },
-  {
-    title: "Quiz",
-    url: "quiz",
-    icon: Files,
     visible: true,
   },
   {
