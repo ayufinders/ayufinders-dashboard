@@ -445,7 +445,6 @@ const CreateQuestionDialog = ({
     setOp4("");
     setCorrectOp(null);
     setExplanation("");
-    setRefTitle("");
     setLink("");
 
     setQuesTextHindi("");
@@ -454,7 +453,6 @@ const CreateQuestionDialog = ({
     setOp3Hindi("");
     setOp4Hindi("");
     setExplanationHindi("");
-    setRefTitleHindi("");
     setLinkHindi("");
 
     setSelectedTags([]);
