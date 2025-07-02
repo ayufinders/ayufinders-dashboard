@@ -345,8 +345,8 @@ const CreateQuestionDialog = ({
   const [explanationHindi, setExplanationHindi] = useState("");
   const [refTitleHindi, setRefTitleHindi] = useState("");
   const [linkHindi, setLinkHindi] = useState("");
-  const [bookId, setBookId] = useState("");
-  const [sectionId, setSectionId] = useState("");
+  const [bookId, setBookId] = useState<string|null>(null);
+  const [sectionId, setSectionId] = useState<string|null>(null);
 
   const { toast } = useToast();
 
@@ -845,7 +845,10 @@ const QuestionForm = ({
           Reference <span className="text-xs text-gray-500">Optional</span>
         </Label>
         {type==='update' && <div className="col-span-4 border p-2 rounded text-sm"><p>Current: {visibleRef}</p></div>}
-        <div className="col-span-4 border p-2 rounded text-sm"><p>New: {refTitle}</p></div>
+        <Input 
+        value={refTitle}
+        onChange={(e)=>{setRefTitle(e.target.value)}}
+        className="col-span-4 border p-2 rounded text-sm"></Input>
         <div className="col-span-4 flex flex-row gap-2 items-center">
           <Select
             value={(selectedBookId as string) || ""}
@@ -1125,7 +1128,10 @@ const QuestionFormHindi = ({
           Reference <span className="text-xs text-gray-500">Optional</span>
         </Label>
         {type==='update' && <div className="col-span-4 border p-2 rounded text-sm"><p>Current: {visibleRef}</p></div>}
-        <div className="col-span-4 border p-2 rounded text-sm"><p>New: {refTitle}</p></div>
+        <Input 
+        value={refTitle}
+        onChange={(e)=>{setRefTitle(e.target.value)}}
+        className="col-span-4 border p-2 rounded text-sm"></Input>
         <div className="col-span-4 flex flex-row gap-2 items-center">
           <Select
             value={selectedBookId || ""}
