@@ -747,7 +747,7 @@ const QuestionForm = ({
     const sectionName =
       sections.find((section) => section._id === selectedSectionId)?.nameEng ||
       "";
-    if (!bookName || !sectionName) return;
+    if (!bookName) return;
     const ref = `${bookName} - ${sectionName} - ${chapter} - ${shloka}`;
 
     setRefTitle(ref);
@@ -1026,7 +1026,7 @@ const QuestionFormHindi = ({
     const sectionName =
       sections.find((section) => section._id === selectedSectionId)
         ?.nameHindi || "";
-    if(!bookName || !sectionName) return;
+    if(!bookName) return;
     const ref = `${bookName} - ${sectionName} - ${chapter} - ${shloka}`;
     setRefTitle(ref);
   }, [
