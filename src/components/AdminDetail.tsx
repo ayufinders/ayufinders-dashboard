@@ -51,7 +51,7 @@ const AdminDetail = () => {
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="flex items-center gap-2">
             <UserCircle2 className="h-5 w-5" />
-            <span className="text-sm font-medium">{user.name || "Admin"}</span>
+            <span className="text-sm font-medium text-wrap">{user.name || "Admin"}</span>
             <ChevronDown />
           </Button>
         </DropdownMenuTrigger>

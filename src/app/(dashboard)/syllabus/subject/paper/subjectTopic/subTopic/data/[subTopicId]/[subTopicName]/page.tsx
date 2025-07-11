@@ -1527,7 +1527,7 @@ const ViewQuestionDialog = ({ question }: { question: QuestionType }) => {
           <div>
             Correct:{" "}
             <span className="text-green-600">
-              {question.options[question.correctOption]?.text || "N/A"}
+              {question.options[question.correctOption-1]?.text || "N/A"}
             </span>
           </div>
           <div className="flex flex-col bg-gray-50 rounded-lg p-4">
