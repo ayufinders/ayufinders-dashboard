@@ -135,9 +135,9 @@ const SubjectTopics = () => {
         </div>
       </div>
 
-      <div className="overflow-y-scroll max-h-[80vh]">
+      <div className="">
         {subjectTopics.length > 0 && (
-          <section className="max-h-[75vh] min-w-[80vw] border">
+          <section className="max-h-[85vh] overflow-y-scroll min-w-[80vw] border">
             <h2 className="font-semibold p-2 bg-gray-50 text-gray-500">
               SUBJECT TOPICS
             </h2>
@@ -149,7 +149,7 @@ const SubjectTopics = () => {
         )}
 
         {paperSections.length > 0 && (
-          <section className="max-h-[75vh] min-w-[80vw] border">
+          <section className="max-h-[85vh] overflow-y-scroll min-w-[80vw] border">
             <h2 className="font-semibold p-2 bg-gray-50 text-gray-500">
               PARTS
             </h2>
