@@ -40,7 +40,7 @@ const SubjectTopics = () => {
   >([]);
   const [search, setSearch] = useState("");
 
-  const router = useRouter()
+  const router = useRouter();
   const params = useParams();
   const paperId = params.paperId;
   const paperName = decodeURIComponent(params.paperName as string);
@@ -52,8 +52,8 @@ const SubjectTopics = () => {
         {
           withCredentials: true,
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
       );
       const topics = response.data.data;
@@ -71,8 +71,8 @@ const SubjectTopics = () => {
         {
           withCredentials: true,
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
       );
       const sections = response.data.data;
@@ -103,7 +103,7 @@ const SubjectTopics = () => {
 
   return (
     <main className="p-4 min-w-[80vw]">
-      <div className="sticky top-0 bg-white">
+      <div className="z-50 sticky top-0 bg-white">
         <div className="flex flex-row justify-between items-center p-4">
           <p className="font-bold text-3xl">{paperName}</p>
           <div className="flex flex-row gap-2">
@@ -125,9 +125,9 @@ const SubjectTopics = () => {
               paperId={paperId as string}
             />
             <Button
-            onClick={()=>{
-              router.back()
-            }}
+              onClick={() => {
+                router.back();
+              }}
             >
               Back
             </Button>
@@ -135,31 +135,34 @@ const SubjectTopics = () => {
         </div>
       </div>
 
-      {subjectTopics.length > 0 && (
-        <section className="max-h-[75vh] min-w-[80vw] border">
-          <h2 className="font-semibold p-2 bg-gray-50 text-gray-500">
-            SUBJECT TOPICS
-          </h2>
-          <SubjectTopicList
-            topics={filteredSubjectTopics}
-            fetchTopics={fetchTopics}
-          />
-        </section>
-      )}
+      <div className="overflow-y-scroll max-h-[80vh]">
+        {subjectTopics.length > 0 && (
+          <section className="max-h-[75vh] min-w-[80vw] border">
+            <h2 className="font-semibold p-2 bg-gray-50 text-gray-500">
+              SUBJECT TOPICS
+            </h2>
+            <SubjectTopicList
+              topics={filteredSubjectTopics}
+              fetchTopics={fetchTopics}
+            />
+          </section>
+        )}
 
-      {paperSections.length > 0 && (
-        <section className="max-h-[75vh] min-w-[80vw] border">
-          <h2 className="font-semibold p-2 bg-gray-50 text-gray-500">PARTS</h2>
-          <PaperSectionList
-            sections={filteredPaperSections}
-            fetchSections={fetchSections}
-          />
-        </section>
-      )}
+        {paperSections.length > 0 && (
+          <section className="max-h-[75vh] min-w-[80vw] border">
+            <h2 className="font-semibold p-2 bg-gray-50 text-gray-500">
+              PARTS
+            </h2>
+            <PaperSectionList
+              sections={filteredPaperSections}
+              fetchSections={fetchSections}
+            />
+          </section>
+        )}
+      </div>
     </main>
   );
 };
-
 
 const SubjectTopicList = ({
   topics,
@@ -280,7 +283,7 @@ const AddSubjectTopic = ({
   const [subjectTopicDesc, setSubjectTopicDesc] = useState("");
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
-  const {user, selectedYear} = useUserContext()
+  const { user, selectedYear } = useUserContext();
 
   const addSubjectTopicHandler = async () => {
     try {
@@ -296,7 +299,7 @@ const AddSubjectTopic = ({
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -312,7 +315,7 @@ const AddSubjectTopic = ({
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -328,12 +331,11 @@ const AddSubjectTopic = ({
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
       );
-
 
       if (!response.data.success) {
         toast({
@@ -346,7 +348,6 @@ const AddSubjectTopic = ({
           title: "Topic created.",
           description: `${subjectTopicName} has been successfully created.`,
         });
-        
       }
     } catch (error) {
       console.error(error);
@@ -384,7 +385,6 @@ const AddSubjectTopic = ({
             rows={2}
             placeholder="Subject Description (optional)"
           ></Textarea>
-          
         </div>
         <DialogFooter>
           <Button
@@ -425,7 +425,7 @@ const AddPaperSection = ({
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -524,7 +524,7 @@ const UpdateSubjectTopicDialog = ({
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -622,7 +622,7 @@ const UpdatePaperSectionDialog = ({
         {
           headers: {
             "Content-Type": "application/json",
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
+            Authorization: "Bearer " + localStorage.getItem("token"),
           },
           withCredentials: true,
         }
@@ -713,8 +713,8 @@ const DeleteSubjectTopicModalButton = ({
         {
           withCredentials: true,
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
       );
       toast({
@@ -785,8 +785,8 @@ const DeletePaperSectionModalButton = ({
         {
           withCredentials: true,
           headers: {
-            'Authorization': 'Bearer ' + localStorage.getItem("token")
-          }
+            Authorization: "Bearer " + localStorage.getItem("token"),
+          },
         }
       );
       toast({
@@ -835,7 +835,5 @@ const DeletePaperSectionModalButton = ({
     </Dialog>
   );
 };
-
-
 
 export default SubjectTopics;
