@@ -245,7 +245,7 @@ const AddSubTopic = ({
           title: "Sub Topic created.",
           description: `${subTopicName} has been successfully created.`,
         });
-        fetchTopics();
+        
       }
     } catch (error) {
       console.error(error);
@@ -254,6 +254,7 @@ const AddSubTopic = ({
       setSubTopicDesc("");
       setType("");
       setLoading(false);
+      fetchTopics();
     }
   };
 
