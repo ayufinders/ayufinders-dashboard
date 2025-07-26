@@ -246,7 +246,6 @@ const AddSubjectTopic = ({
           title: "Topic created.",
           description: `${subjectTopicName} has been successfully created.`,
         });
-        fetchTopics();
       }
     } catch (error) {
       console.error(error);
@@ -254,6 +253,7 @@ const AddSubjectTopic = ({
       setSubjectTopicName("");
       setSubjectTopicDesc("");
       setLoading(false);
+      fetchTopics();
     }
   };
 
