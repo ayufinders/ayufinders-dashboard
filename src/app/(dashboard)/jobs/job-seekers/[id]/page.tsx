@@ -4,31 +4,33 @@ import axios from "axios";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import { Employee } from "@/types";
+import Image from "next/image";
 
 export default function CandidateProfilePage() {
   const params = useParams();
   const id = params.id as string;
 
-  const [employee, setEmployee] = useState<any>(null);
+  const [employee, setEmployee] = useState<Employee | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchEmployee = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_JOBS_URL}/admin/employees/${id}`,
+        );
+
+        setEmployee(res.data?.employee || res.data?.data?.employee);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchEmployee();
   }, [id]);
-
-  const fetchEmployee = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_JOBS_URL}/admin/employees/${id}`,
-      );
-
-      setEmployee(res.data?.employee || res.data?.data?.employee);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -71,7 +73,7 @@ export default function CandidateProfilePage() {
           <div className="flex flex-col lg:flex-row gap-8">
             <div className="flex items-center gap-5 flex-1">
               {employee.profilePicture ? (
-                <img
+                <Image
                   src={`${process.env.NEXT_PUBLIC_AWS_URL}/${employee.profilePicture}`}
                   alt={employee.fullName}
                   className="h-24 w-24 rounded-full object-cover border"

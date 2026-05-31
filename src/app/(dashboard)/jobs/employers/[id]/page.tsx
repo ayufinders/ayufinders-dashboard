@@ -1,6 +1,7 @@
 "use client";
 
 import axios from "axios";
+import Image from "next/image";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -13,25 +14,22 @@ export default function EmployerProfilePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchEmployer = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_JOBS_URL}/admin/employers/${id}`,
+        );
+
+        setEmployer(res.data?.data?.employer || res.data?.employer);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchEmployer();
   }, [id]);
-
-  const fetchEmployer = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_JOBS_URL}/admin/employers/${id}`
-      );
-
-      setEmployer(
-        res.data?.data?.employer ||
-        res.data?.employer
-      );
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
 
   if (loading) {
     return (
@@ -59,7 +57,6 @@ export default function EmployerProfilePage() {
   return (
     <div className="min-h-screen ">
       <div className="max-w-7xl mx-auto p-6">
-
         {/* Back */}
 
         <Link
@@ -73,12 +70,11 @@ export default function EmployerProfilePage() {
 
         <div className="bg-white border border-stone-200 rounded-2xl p-8 mt-4 shadow-sm">
           <div className="flex flex-col lg:flex-row gap-8">
-
             {/* Left */}
 
             <div className="flex items-center gap-5 flex-1">
               {employer.organizationLogo ? (
-                <img
+                <Image
                   src={employer.organizationLogo}
                   alt={employer.organizationName}
                   className="h-24 w-24 rounded-2xl object-cover border"
@@ -97,28 +93,17 @@ export default function EmployerProfilePage() {
                 <p className="text-stone-500 mt-1">
                   {employer.typeOfOrganization || "-"}
                 </p>
-
-                
               </div>
             </div>
 
             {/* Right */}
 
             <div className="grid grid-cols-1 gap-2 text-sm min-w-[350px]">
-              <InfoRow
-                label="Email"
-                value={employer.email}
-              />
+              <InfoRow label="Email" value={employer.email} />
 
-              <InfoRow
-                label="Phone"
-                value={employer.contactNumber}
-              />
+              <InfoRow label="Phone" value={employer.contactNumber} />
 
-              <InfoRow
-                label="Contact Person"
-                value={employer.contactPerson}
-              />
+              <InfoRow label="Contact Person" value={employer.contactPerson} />
 
               <InfoRow
                 label="Designation"
@@ -131,11 +116,9 @@ export default function EmployerProfilePage() {
         {/* Content */}
 
         <div className="grid lg:grid-cols-3 gap-5 mt-5">
-
           {/* Main */}
 
           <div className="lg:col-span-2 space-y-5">
-
             <Card title="Organization Information">
               <GridInfo
                 items={[
@@ -149,13 +132,11 @@ export default function EmployerProfilePage() {
                   },
                   {
                     label: "Established",
-                    value:
-                      employer.yearOfEstablishment,
+                    value: employer.yearOfEstablishment,
                   },
                   {
                     label: "Employees",
-                    value:
-                      employer.numberOfEmployees,
+                    value: employer.numberOfEmployees,
                   },
                 ]}
               />
@@ -166,18 +147,15 @@ export default function EmployerProfilePage() {
                 items={[
                   {
                     label: "Contact Person",
-                    value:
-                      employer.contactPerson,
+                    value: employer.contactPerson,
                   },
                   {
                     label: "Designation",
-                    value:
-                      employer.contactDesignation,
+                    value: employer.contactDesignation,
                   },
                   {
                     label: "Phone",
-                    value:
-                      employer.contactNumber,
+                    value: employer.contactNumber,
                   },
                   {
                     label: "Email",
@@ -189,7 +167,6 @@ export default function EmployerProfilePage() {
 
             <Card title="Recognition & Affiliations">
               <div className="space-y-5">
-
                 <div>
                   <div className="text-xs uppercase text-stone-500 mb-3">
                     Recognition
@@ -197,13 +174,9 @@ export default function EmployerProfilePage() {
 
                   <div className="flex flex-wrap gap-2">
                     {employer.recognition?.length ? (
-                      employer.recognition.map(
-                        (item: string) => (
-                          <Badge key={item}>
-                            {item}
-                          </Badge>
-                        )
-                      )
+                      employer.recognition.map((item: string) => (
+                        <Badge key={item}>{item}</Badge>
+                      ))
                     ) : (
                       <Empty />
                     )}
@@ -214,13 +187,11 @@ export default function EmployerProfilePage() {
                   items={[
                     {
                       label: "University",
-                      value:
-                        employer.universityName,
+                      value: employer.universityName,
                     },
                     {
                       label: "Recognition Other",
-                      value:
-                        employer.recognitionOther,
+                      value: employer.recognitionOther,
                     },
                   ]}
                 />
@@ -232,44 +203,33 @@ export default function EmployerProfilePage() {
                 items={[
                   {
                     label: "Street",
-                    value:
-                      employer.address?.street,
+                    value: employer.address?.street,
                   },
                   {
                     label: "City",
-                    value:
-                      employer.address?.city,
+                    value: employer.address?.city,
                   },
                   {
                     label: "State",
-                    value:
-                      employer.address?.state,
+                    value: employer.address?.state,
                   },
                   {
                     label: "PIN Code",
-                    value:
-                      employer.address?.pin,
+                    value: employer.address?.pin,
                   },
                 ]}
               />
             </Card>
-
-            
           </div>
 
           {/* Sidebar */}
 
           <div className="space-y-5">
-
-            
-
             <Card title="Website">
               {employer.website ? (
                 <a
                   href={
-                    employer.website.startsWith(
-                      "http"
-                    )
+                    employer.website.startsWith("http")
                       ? employer.website
                       : `https://${employer.website}`
                   }
@@ -299,26 +259,17 @@ export default function EmployerProfilePage() {
               <div className="space-y-3">
                 <StatRow
                   label="Employees"
-                  value={
-                    employer.numberOfEmployees ||
-                    "-"
-                  }
+                  value={employer.numberOfEmployees || "-"}
                 />
 
                 <StatRow
                   label="Established"
-                  value={
-                    employer.yearOfEstablishment ||
-                    "-"
-                  }
+                  value={employer.yearOfEstablishment || "-"}
                 />
 
                 <StatRow
                   label="Recognitions"
-                  value={
-                    employer.recognition
-                      ?.length || 0
-                  }
+                  value={employer.recognition?.length || 0}
                 />
               </div>
             </Card>
@@ -338,20 +289,14 @@ function Card({
 }) {
   return (
     <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
-      <h2 className="font-semibold text-stone-900 mb-5">
-        {title}
-      </h2>
+      <h2 className="font-semibold text-stone-900 mb-5">{title}</h2>
 
       {children}
     </div>
   );
 }
 
-function Badge({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+function Badge({ children }: { children: React.ReactNode }) {
   return (
     <span className="px-3 py-1.5 rounded-full text-stone-700 text-sm">
       {children}
@@ -359,22 +304,12 @@ function Badge({
   );
 }
 
-function InfoRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: any;
-}) {
+function InfoRow({ label, value }: { label: string; value: any }) {
   return (
     <div className="flex justify-between">
-      <span className="text-stone-500">
-        {label}
-      </span>
+      <span className="text-stone-500">{label}</span>
 
-      <span className="text-stone-900">
-        {value || "-"}
-      </span>
+      <span className="text-stone-900">{value || "-"}</span>
     </div>
   );
 }
@@ -391,43 +326,25 @@ function GridInfo({
     <div className="grid md:grid-cols-2 gap-4">
       {items.map((item) => (
         <div key={item.label}>
-          <div className="text-xs uppercase text-stone-500">
-            {item.label}
-          </div>
+          <div className="text-xs uppercase text-stone-500">{item.label}</div>
 
-          <div className="text-sm text-stone-900 mt-1">
-            {item.value || "-"}
-          </div>
+          <div className="text-sm text-stone-900 mt-1">{item.value || "-"}</div>
         </div>
       ))}
     </div>
   );
 }
 
-function StatRow({
-  label,
-  value,
-}: {
-  label: string;
-  value: any;
-}) {
+function StatRow({ label, value }: { label: string; value: any }) {
   return (
     <div className="flex items-center justify-between border-b border-stone-100 pb-2">
-      <span className="text-sm text-stone-500">
-        {label}
-      </span>
+      <span className="text-sm text-stone-500">{label}</span>
 
-      <span className="font-medium text-stone-900">
-        {value}
-      </span>
+      <span className="font-medium text-stone-900">{value}</span>
     </div>
   );
 }
 
 function Empty() {
-  return (
-    <div className="text-sm text-stone-500">
-      No data available
-    </div>
-  );
+  return <div className="text-sm text-stone-500">No data available</div>;
 }

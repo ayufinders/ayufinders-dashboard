@@ -7,25 +7,25 @@ import { useEffect, useState } from "react";
 
 export default function JobDetailPage() {
   const params = useParams();
-
+  const id = params.id;
   const [job, setJob] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    const fetchJob = async () => {
+      try {
+        const res = await axios.get(
+          `${process.env.NEXT_PUBLIC_JOBS_URL}/admin/jobs/${id}`,
+        );
+
+        setJob(res.data?.data?.job || res.data?.job);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchJob();
-  }, []);
-
-  const fetchJob = async () => {
-    try {
-      const res = await axios.get(
-        `${process.env.NEXT_PUBLIC_JOBS_URL}/admin/jobs/${params.id}`,
-      );
-
-      setJob(res.data?.data?.job || res.data?.job);
-    } finally {
-      setLoading(false);
-    }
-  };
+  }, [id]);
 
   if (loading) {
     return (
@@ -87,7 +87,6 @@ export default function JobDetailPage() {
           {/* LEFT */}
 
           <div className="lg:col-span-2 space-y-5">
-
             <Card title="Job Description">
               <div className="whitespace-pre-wrap text-sm text-stone-700 leading-7">
                 {job.description || "No description"}
@@ -95,56 +94,56 @@ export default function JobDetailPage() {
             </Card>
 
             {job.employer && (
-  <Card title="Employer Information">
-    <div className="flex items-start justify-between gap-6">
-      <div className="space-y-4 flex-1">
-        <div>
-          <div className="text-lg font-semibold text-stone-900">
-            {job.employer.organizationName}
-          </div>
+              <Card title="Employer Information">
+                <div className="flex items-start justify-between gap-6">
+                  <div className="space-y-4 flex-1">
+                    <div>
+                      <div className="text-lg font-semibold text-stone-900">
+                        {job.employer.organizationName}
+                      </div>
 
-          <div className="text-sm text-stone-500 mt-1">
-            {job.employer.typeOfOrganization}
-          </div>
-        </div>
+                      <div className="text-sm text-stone-500 mt-1">
+                        {job.employer.typeOfOrganization}
+                      </div>
+                    </div>
 
-        <GridInfo
-          items={[
-            {
-              label: "Contact Person",
-              value: job.employer.contactPerson,
-            },
-            {
-              label: "Contact Number",
-              value: job.employer.contactNumber,
-            },
-            {
-              label: "Email",
-              value: job.employer.email,
-            },
-            {
-              label: "Location",
-              value: [
-                job.employer.address?.city,
-                job.employer.address?.state,
-              ]
-                .filter(Boolean)
-                .join(", "),
-            },
-          ]}
-        />
+                    <GridInfo
+                      items={[
+                        {
+                          label: "Contact Person",
+                          value: job.employer.contactPerson,
+                        },
+                        {
+                          label: "Contact Number",
+                          value: job.employer.contactNumber,
+                        },
+                        {
+                          label: "Email",
+                          value: job.employer.email,
+                        },
+                        {
+                          label: "Location",
+                          value: [
+                            job.employer.address?.city,
+                            job.employer.address?.state,
+                          ]
+                            .filter(Boolean)
+                            .join(", "),
+                        },
+                      ]}
+                    />
 
-        {job.employer.website && (
-          <div className="flex items-center gap-3 pt-2">
-            <a
-              href={
-                job.employer.website.startsWith("http")
-                  ? job.employer.website
-                  : `https://${job.employer.website}`
-              }
-              target="_blank"
-              rel="noopener noreferrer"
-              className="
+                    {job.employer.website && (
+                      <div className="flex items-center gap-3 pt-2">
+                        <a
+                          href={
+                            job.employer.website.startsWith("http")
+                              ? job.employer.website
+                              : `https://${job.employer.website}`
+                          }
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="
                 inline-flex
                 items-center
                 rounded-lg
@@ -156,13 +155,13 @@ export default function JobDetailPage() {
                 font-medium
                 hover:bg-stone-50
               "
-            >
-              Visit Website
-            </a>
+                        >
+                          Visit Website
+                        </a>
 
-            <Link
-              href={`/jobs/employers/${job.employer._id}`}
-              className="
+                        <Link
+                          href={`/jobs/employers/${job.employer._id}`}
+                          className="
                 inline-flex
                 items-center
                 rounded-lg
@@ -174,15 +173,15 @@ export default function JobDetailPage() {
                 font-medium
                 hover:bg-stone-800
               "
-            >
-              View Employer Profile
-            </Link>
-          </div>
-        )}
-      </div>
-    </div>
-  </Card>
-)}
+                        >
+                          View Employer Profile
+                        </Link>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </Card>
+            )}
 
             <Card title="Requirements">
               <GridInfo
@@ -251,8 +250,6 @@ export default function JobDetailPage() {
                 </div>
               </div>
             </Card>
-
-            
           </div>
 
           {/* RIGHT */}
@@ -293,14 +290,16 @@ export default function JobDetailPage() {
                   {
                     label: "Deadline",
                     value: job.applicationDeadline
-                      ? new Date(job.applicationDeadline).toLocaleDateString("en-GB", {
-                          day: "2-digit",
-                          month: "2-digit",
-                          year: "numeric",
-                        })
+                      ? new Date(job.applicationDeadline).toLocaleDateString(
+                          "en-GB",
+                          {
+                            day: "2-digit",
+                            month: "2-digit",
+                            year: "numeric",
+                          },
+                        )
                       : "-",
                   },
-                  
                 ]}
               />
             </Card>
@@ -313,7 +312,13 @@ export default function JobDetailPage() {
 
 /* Components */
 
-function Card({ title, children }: any) {
+function Card({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
   return (
     <div className="bg-white border border-stone-200 rounded-2xl p-6 shadow-sm">
       <h2 className="font-semibold mb-5">{title}</h2>
@@ -330,7 +335,12 @@ function Badge({ children }: any) {
   );
 }
 
-function GridInfo({ items }: any) {
+interface GridItem {
+  label: string;
+  value?: string | number | null;
+}
+
+function GridInfo({ items }: { items: GridItem[] }) {
   return (
     <div className="grid md:grid-cols-2 gap-4">
       {items.map((item: any) => (
@@ -344,7 +354,7 @@ function GridInfo({ items }: any) {
   );
 }
 
-function Metric({ label, value }: any) {
+function Metric({ label, value }: { label: string; value: string | number }) {
   return (
     <div>
       <div className="text-xs uppercase text-stone-500">{label}</div>

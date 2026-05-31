@@ -136,3 +136,74 @@ export interface BookSectionType {
   description: string;
   createdBy: AdminType;
 }
+
+export interface Employee {
+  _id: string;
+  fullName: string;
+  email?: string;
+  gender?: string;
+  dob?: Date;
+  contactNumber?: string;
+  profilePicture?: string;
+  specialization?: string;
+  qualification?: string[];
+  qualificationOther?: string;
+  fellowshipDetails?: string;
+  diplomaDetails?: string;
+
+  address?: {
+    city?: string;
+    state?: string;
+    pin?: string;
+  };
+
+  skills?: string[];
+  languagesKnown?: string[];
+
+  currentDesignation?: string;
+  currentEmployer?: string;
+
+  registration?: {
+    number?: string;
+    council?: string;
+  };
+
+  visibility?: string;
+
+  clinicalYearsExact?: number;
+  clinicalMonthsExact?: number;
+
+  teachingYearsExact?: number;
+  teachingMonthsExact?: number;
+
+  researchYearsExact?: number;
+  researchMonthsExact?: number;
+
+  preferredWorkArea?: string[];
+  jobType?: string[];
+
+  willingnessToRelocate?: boolean;
+
+  expectedSalary?: {
+    min?: number;
+    max?: number;
+  };
+
+  resume?: {
+    url?: string;
+    name?: string;
+  };
+
+  certificates?: {
+    url: string;
+    name?: string;
+  }[];
+
+  researchPublications?: {
+    hasPublications?: boolean;
+    links?: {
+      title?: string;
+      link?: string;
+    }[];
+  };
+}

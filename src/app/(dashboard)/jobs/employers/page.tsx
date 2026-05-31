@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import axios from "axios";
 import Link from "next/link";
+import Image from "next/image";
 
 const ORGANIZATION_TYPES = [
   "Medical college & Hospital",
@@ -225,7 +226,7 @@ export default function EmployersPage() {
                       <td className="px-6 py-6">
                         <div className="flex items-center gap-3">
                           {emp.organizationLogo ? (
-                            <img
+                            <Image
                               src={
                                 emp.organizationLogo
                               }
