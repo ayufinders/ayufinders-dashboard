@@ -4,6 +4,7 @@ import type { NextRequest } from 'next/server';
 export function middleware(request: NextRequest) {
   const currentPath = request.nextUrl.pathname;
   const cookies = request.cookies.get('authToken');
+  
   const isLoggedIn = !!cookies?.value;
 
   // Redirect logged-in users away from the signin page

@@ -11,7 +11,7 @@ export default function LoginPage() {
   const router = useRouter();
 
   const { setUser, setSelectedYear } = useUserContext();
-
+  
   const handleLogin = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setError("");
@@ -27,7 +27,7 @@ export default function LoginPage() {
           withCredentials: true,
         }
       );
-
+      
       if (response.status === 200) {
         const user = {
           name: response.data.admin.name,
@@ -39,11 +39,12 @@ export default function LoginPage() {
           subjectName: response.data.admin.subjectName || null,
           year: response.data.admin.year || null,
         };
+        
         setUser(user);
         setSelectedYear(user.year);
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", response.data.token);
-
+        
         // Redirect to the dashboard
         if(user.access === "full") {
           router.replace("/");

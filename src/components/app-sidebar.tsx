@@ -1,5 +1,5 @@
 "use client"
-import { Tags, Book, University, Loader, Pin } from "lucide-react"
+import { Tags, Book, University, Loader, Pin, Users, Users2, File } from "lucide-react"
 import {
   Sidebar,
   SidebarContent,
@@ -58,6 +58,25 @@ export function AppSidebar() {
     url: "reference",
     icon: Pin,
   },
+]
+
+const jobsItems = [
+  
+  {
+    title: "Job Seekers",
+    url: "jobs/job-seekers",
+    icon: Users,
+  },
+  {
+    title: "Employers",
+    url: "jobs/employers",
+    icon: Users2,
+  },
+  {
+    title: "Job Posts",
+    url: "jobs/job-posts",
+    icon: File,
+  },
   
 ]
   
@@ -86,6 +105,30 @@ export function AppSidebar() {
                     className={cn("hover:bg-gray-200 mb-1 text-gray-500 hover:text-gray-500", {
                       "bg-gray-300 font-semibold hover:bg-gray-300 hover:font-semibold": path===item.url,
                       "hidden": item.visible === false,
+                    })}
+                    >
+                      <item.icon className="h-6 w-6"/>
+                      <span className="text-md">{item.title}</span>
+                    </div>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </SidebarMenu>
+          </SidebarGroupContent>
+        </SidebarGroup>
+
+        <SidebarGroup>
+          <SidebarGroupLabel className="text-md">Jobs</SidebarGroupLabel>
+          <SidebarGroupContent>
+            <SidebarMenu>
+              {jobsItems.map((item) => (
+                <SidebarMenuItem key={item.title} className="cursor-pointer">
+                  <SidebarMenuButton asChild>
+                    <div onClick={()=>{
+                      router.replace(`/${item.url}`)
+                    }}
+                    className={cn("hover:bg-gray-200 mb-1 text-gray-500 hover:text-gray-500", {
+                      "bg-gray-300 font-semibold hover:bg-gray-300 hover:font-semibold": path===item.url
                     })}
                     >
                       <item.icon className="h-6 w-6"/>
